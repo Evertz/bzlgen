@@ -234,8 +234,8 @@ export class NgGenerator extends BuildFileGenerator {
 
     this.buildozer.newLoad(flags.ng_module_bundle_load, 'ng_module', pathLabel);
     this.buildozer.newRule('ng_module', pathLabel);
-    this.buildozer.addAttr('ts_srcs', tsFiles.map(file => file.split('/').pop()), pathLabel);
-    this.buildozer.addAttr('ts_deps', Array.from(resultContainer.tsDeps), pathLabel);
+    this.buildozer.addAttr('srcs', tsFiles.map(file => file.split('/').pop()), pathLabel);
+    this.buildozer.addAttr('deps', Array.from(resultContainer.tsDeps), pathLabel);
 
     if (resultContainer.styles.size) {
       // ng_module macro only supports one style
