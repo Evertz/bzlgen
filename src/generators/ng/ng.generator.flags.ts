@@ -1,11 +1,9 @@
+import { setupGeneratorCommand as setupTsGeneratorCommand } from '../ts/ts.generator.flags';
+
 export function setupGeneratorCommand(y) {
-  return y.option('ng_npm_workspace_name', {
-    type: 'string',
-    description: 'The name of the npm bazel workspace',
-    default: 'npm',
-    requiresArg: true,
-    group: 'Ng Generator'
-  }).option('ng_generate_theme_binary', {
+  setupTsGeneratorCommand(y);
+
+  return y.option('ng_generate_theme_binary', {
     type: 'boolean',
     description: 'Generate sass_binary rules for .theme.scss files',
     default: false,
@@ -19,11 +17,6 @@ export function setupGeneratorCommand(y) {
 }
 
 export interface NgGeneratorFlags {
-  /**
-   * The name of the npm bazel workspace
-   */
-  ng_npm_workspace_name: string;
-
   /**
    * Generate sass_binary rules for .theme.scss files
    */

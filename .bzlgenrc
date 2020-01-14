@@ -12,6 +12,7 @@
 --load_mapping=sass_binary=@io_bazel_rules_sass//sass:sass.bzl
 --load_mapping=ts_library=@npm_bazel_typescript//:defs.bzl
 --load_mapping=ng_module=@npm_angular_bazel//:index.bzl
+--load_mapping=ng_module=@npm_bazel_typescript//:index.bzl
 
 # label mappings
 --label_mapping=rxjs/operators=@npm//rxjs

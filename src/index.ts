@@ -4,6 +4,7 @@ import { setupAndParseArgs, Flags, GeneratorType } from './flags';
 import { BuildFileGenerator } from './generators/generator';
 import { NgGenerator } from './generators/ng/ng.generator';
 import { SassGenerator } from './generators/sass/sass.generator';
+import { TsGenerator } from './generators/ts/ts.generator';
 import { debug, error, fatal, isDebugEnabled, lb, log, warn } from './logger';
 import { snapshot, wrap, writeTracingProfile, TRACER_PATH } from './tracing';
 import { Workspace } from './workspace';
@@ -26,6 +27,8 @@ function getGenerator(type: GeneratorType, workspace: Workspace): BuildFileGener
   switch (type)  {
     case GeneratorType.SASS:
       return new SassGenerator(workspace);
+    case GeneratorType.TS:
+      return new TsGenerator(workspace);
     case GeneratorType.NG:
     case GeneratorType.NG_BUNDLE:
       return new NgGenerator(workspace);

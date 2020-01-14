@@ -1,19 +1,12 @@
 import { tsquery } from '@phenomnomnominal/tsquery';
 import { parse } from 'path';
-import { ExportDeclaration, Expression, ImportDeclaration, StringLiteral } from 'typescript';
+import { StringLiteral } from 'typescript';
 
-import { Buildozer } from '../../buildozer';
 import { GeneratorType } from '../../flags';
-import { Label } from '../../label';
-import { fatal, log } from '../../logger';
+import { fatal } from '../../logger';
 import { Workspace } from '../../workspace';
-import { BuildFileGenerator } from '../generator';
 import { SassGenerator } from '../sass/sass.generator';
-
-const IGNORED_IMPORTS: string[] = [];
-
-const IMPORTS_QUERY = `ImportDeclaration:has(StringLiteral)`;
-const EXPORTS_QUERY = `ExportDeclaration:has(StringLiteral)`;
+import { TsGenerator } from '../ts/ts.generator';
 
 const STYLE_URLS_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="styleUrls"]) ArrayLiteralExpression StringLiteral';
 const TEMPLATE_URL_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="templateUrl"]) StringLiteral';
@@ -24,12 +17,9 @@ type TsFileResultContainer = {
   assets: Set<string>
 };
 
-export class NgGenerator extends BuildFileGenerator {
-  private readonly buildozer: Buildozer;
-
-  constructor(private readonly workspace: Workspace) {
-    super();
-    this.buildozer = workspace.getBuildozer();
+export class NgGenerator extends TsGenerator {
+  constructor(readonly workspace: Workspace) {
+    super(workspace);
   }
 
   async generate(): Promise<void> {
@@ -47,7 +37,7 @@ export class NgGenerator extends BuildFileGenerator {
     };
 
     tsFiles
-      .forEach((file, i, arr) => this.processTsFile(file, arr, flags.ng_npm_workspace_name, flags.suffix_separator, resultContainer));
+      .forEach((file, i, arr) => this.processTsFile(file, arr, flags.npm_workspace_name, flags.suffix_separator, resultContainer));
 
     if (this.getGeneratorType() === GeneratorType.NG) {
       this.generateNgModule(files, tsFiles, resultContainer);
@@ -77,15 +67,7 @@ export class NgGenerator extends BuildFileGenerator {
     const file = this.workspace.readFile(filePath);
     const ast = tsquery.ast(file);
 
-    tsquery(ast, IMPORTS_QUERY)
-      .map((node: ImportDeclaration) => this.resolveLabelFromModuleSpecifier(node.moduleSpecifier, tsFiles, npmWorkspace))
-      .filter(label => !!label)
-      .forEach(label => resultContainer.tsDeps.add(label.toString()));
-
-    tsquery(ast, EXPORTS_QUERY)
-      .map((node: ExportDeclaration) => this.resolveLabelFromModuleSpecifier(node.moduleSpecifier, tsFiles, npmWorkspace))
-      .filter(label => !!label)
-      .forEach(label => resultContainer.tsDeps.add(label.toString()));
+    this.processTsFileAst(ast, tsFiles, npmWorkspace, resultContainer.tsDeps);
 
     const templateUrlNode = tsquery(ast, TEMPLATE_URL_QUERY)[0] as StringLiteral;
 
@@ -129,23 +111,6 @@ export class NgGenerator extends BuildFileGenerator {
     }
   }
 
-  private resolveLabelFromModuleSpecifier(moduleSpecifier: Expression, tsFiles: string[] = [], npmWorkspace: string): Label | undefined {
-    const moduleSpecifierText = moduleSpecifier.getText().split(`'`)[1];
-
-    const workspaceRelativeImport = this.workspace.resolveRelativeToWorkspace(moduleSpecifierText);
-    if (tsFiles.indexOf(`${workspaceRelativeImport}.ts`) > -1) {
-      return;
-    }
-
-    const label = this.calculateTsDependencyLabel(moduleSpecifierText, npmWorkspace);
-
-    if (this.workspace.getFlags().verbose_import_mappings) {
-      log(`${moduleSpecifierText}=${label}`);
-    }
-
-    return label;
-  }
-
   private calculateScssDependencyLabels(scssFiles: string[], sassGen: SassGenerator, suffixSeparator: string,
                                         labelSuffix: string): Map<string, { deps: Set<string>, name: string }> {
     if (!scssFiles.length) { return new Map(); }
@@ -168,30 +133,6 @@ export class NgGenerator extends BuildFileGenerator {
       });
 
     return results;
-  }
-
-  private calculateTsDependencyLabel(imp: string, npmWorkspace: string): Label | undefined {
-    if (IGNORED_IMPORTS.indexOf(imp) > -1) {
-      return;
-    }
-
-    let label = this.workspace.tryResolveLabelFromStaticMapping(imp, undefined, '.');
-    if (label) { return label; }
-
-    // some imports are deep but resolve to one label (eg material and cdk)
-    if (imp.startsWith('@angular/material')) {
-      return Label.parseAbsolute(`@${npmWorkspace}//@angular/material`);
-    } else if (imp.startsWith('@angular/cdk')) {
-      return Label.parseAbsolute(`@${npmWorkspace}//@angular/material`);
-    }
-
-    if (imp.startsWith('.')) {
-      label = this.workspace.getLabelForFile(imp);
-      if (label) { return label; }
-    }
-
-    // fall back to assuming 3rd_party
-    return Label.parseAbsolute(`@${npmWorkspace}//${imp}`);
   }
 
   private generateNgModule(allFiles: string[], tsFiles: string[], resultContainer: TsFileResultContainer) {

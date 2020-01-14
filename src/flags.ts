@@ -4,6 +4,7 @@ import * as yargs from 'yargs';
 
 import { NgGeneratorFlags } from './generators/ng/ng.generator.flags';
 import { SassGeneratorFlags } from './generators/sass/sass.generator.flags';
+import { TsGeneratorFlags } from './generators/ts/ts.generator.flags';
 import { debug, fatal, lb } from './logger';
 
 export enum GeneratorType {
@@ -164,7 +165,7 @@ interface CommonFlags {
   buildozer_binary: string;
 }
 
-type AllFlags = CommonFlags & SassGeneratorFlags & NgGeneratorFlags;
+type AllFlags = CommonFlags & SassGeneratorFlags & TsGeneratorFlags & NgGeneratorFlags;
 export type Flags = Readonly<AllFlags>;
 
 const commonYargsOptions = y => {
@@ -235,6 +236,11 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       command: 'ng_bundle <path>',
       builder: y => require('./generators/ng/ng.generator.flags').setupGeneratorCommand(commonYargsOptions(y)),
       handler: args => args.type = GeneratorType.NG_BUNDLE
+    })
+    .command({
+      command: 'ts <path>',
+      builder: y => require('./generators/ts/ts.generator.flags').setupGeneratorCommand(commonYargsOptions(y)),
+      handler: args => args.type = GeneratorType.TS
     })
     // command flags
     .option('nuke_build_file', {
