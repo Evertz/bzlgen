@@ -76,7 +76,7 @@ export class NgGenerator extends TsGenerator {
       const splits = url.split('/');
 
       if (splits.length === 2 || splits.length === 0) {
-        // TODO internally there are some templates that pull from the parent directory
+        // TODO(matt) internally there are some templates that pull from the parent directory
         // and bzl gen handles it in a hacky way - don't port this behaviour yet
         // additionally - ensure that the path only contains one (or none) '/', meaning that it's in the same package
 
@@ -154,7 +154,7 @@ export class NgGenerator extends TsGenerator {
         .setSrc(src)
         .setDeps(Array.from(data.deps));
 
-      // TODO: if there are deps on a sass import in the same package we should be able to generate it here
+      // TODO(matt): if there are deps on a sass import in the same package we should be able to generate it here
     });
 
     if (flags.ng_generate_theme_binary) {

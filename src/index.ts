@@ -77,7 +77,7 @@ async function run() {
 
     wrap('buildozer', () => workspace.invokeBuildozer());
 
-    // TODO: we should know the labels that were generated, output them to stdout
+    // TODO(matt): we should know the labels that were generated, output them to stdout
     // so that we can do something like bazel build $(gen ng foo)
     // flags.output_bzl_labels
   } else {
@@ -88,11 +88,7 @@ async function run() {
 run()
   .catch(err => {
     error(err.message);
+    writeTracingProfile();
 
-  })
-  .then(() => {
-    if (isDebugEnabled) { writeTracingProfile(); }
-  })
-  .catch(err => {
-    error(err.message);
+    fatal('Please report this error');
   });
