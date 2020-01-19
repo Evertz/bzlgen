@@ -9,7 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Yarn Install
-      run: yarn install --pure-lockfile
-    - name: Test
-      run: yarn test
+    - name: fetch bazelisk
+      run: |
+        wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.2.1/bazelisk-linux-amd64
+        chmod +x ./bazelisk
+    - name: test
+      run: ./bazelisk test //test

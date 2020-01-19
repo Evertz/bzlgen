@@ -1,5 +1,5 @@
 import { lstatSync, readdirSync, readFileSync, writeFileSync } from 'fs';
-import { kebabCase } from 'lodash';
+import * as kebabCase from 'lodash.kebabcase';
 import { isAbsolute, join, normalize, parse, sep, ParsedPath } from 'path';
 import * as shell from 'shelljs';
 import * as util from 'util';

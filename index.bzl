@@ -1,4 +1,4 @@
-load("@npm_angular_bazel//:index.bzl", _ng_module ="ng_module")
+load("@npm_angular_bazel//:index.bzl", _ng_module = "ng_module")
 load("@io_bazel_rules_sass//sass:sass.bzl", _sass_binary = "sass_binary", _sass_library = "sass_library")
 
 def ng_module(
@@ -21,26 +21,25 @@ def ng_module(
         # the visibility of the ng_module
         visibility = ["//:__subpackages__"],
         **kwargs):
-
     if theme != None:
-      _sass_binary(
-          name = "%s_theme" % name,
-          src = theme,
-          deps = theme_deps,
-          visibility = ["//:__subpackages__"],
-      )
+        _sass_binary(
+            name = "%s_theme" % name,
+            src = theme,
+            deps = theme_deps,
+            visibility = ["//:__subpackages__"],
+        )
 
     ng_module_assets = assets
 
     if style != None:
-      _sass_binary(
-          name = "%s_styles" % name,
-          src = style,
-          deps = style_deps,
-          visibility = visibility,
-      )
+        _sass_binary(
+            name = "%s_styles" % name,
+            src = style,
+            deps = style_deps,
+            visibility = visibility,
+        )
 
-      ng_module_assets = ng_module_assets + [":%s_styles" % name]
+        ng_module_assets = ng_module_assets + [":%s_styles" % name]
 
     _ng_module(
         name = name,

@@ -1,6 +1,3 @@
-
---generate_build_files
-
 # sass generator flags
 --scss_library_suffix=
 

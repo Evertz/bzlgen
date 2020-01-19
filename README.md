@@ -15,18 +15,15 @@ It will try and 'best guess' labels from other packages. It's currently not expe
 but will (in most cases) generate a ~80-90% best effort and reduce the boilerplate needed.
 
 #### Running the generator
-The generator can be run from source via `yarn`
+The generator can be run from source via bazel:
 
 ```
-yarn gen
+bazel run //src:bin -- ts examples/ --base_dir=/usr/workspaces/project
 ```
 
-To generate a BUILD file for the above directory, in the root of the project, run the generator:
-```
-gen ng ./some-component
-```
+To generate BUILD files using bzlgen from source with bazel, set `--base_dir` to the absolute path of the target directory 
 
-There are many option flags that can be set to customize the output of the generator, use `--help`
+There are many option other flags that can be set to customize the output of the generator, see `--help` for more
 
 ### Mapping rules to load statements
 By default, the generator won't load rules into the build file. However this can be changed by setting `load_mapping` flags 
@@ -67,4 +64,4 @@ Each line should contain one flag, all lines are processed, except those startin
 
 ### ng_bundle
 This repo also contains a `ng_module` macro that this generator can generate for by passing the type `ng_bundle`. The macro encapsulates common
-rules used together when building Angular modules, such as a `sass_binary` for a style or theme file. The macro can be found in `defaults.bzl`
+rules used together when building Angular modules, such as a `sass_binary` for a style or theme file. The macro can be found in `index.bzl`

@@ -1,28 +1,31 @@
 {
   "name": "@evertz/bzlgen",
-  "version": "0.1.0",
+  "version": "0.0.0-PLACEHOLDER",
   "description": "Bazel Buildozer command file generator written in Typescript",
+  "repository": {
+    "type": "GIT",
+    "url": "https://github.com/Evertz/bzlgen"
+  },
   "main": "src/index.js",
+  "bin": {
+    "bzlgen": "src/bzlgen.js"
+  },
   "dependencies": {
     "@phenomnomnominal/tsquery": "3.0.0",
     "gonzales-pe": "4.2.4",
-    "lodash": "4.17.15",
+    "lodash.kebabcase": "4.1.1",
     "shelljs": "0.8.3",
     "signale": "1.4.0",
     "typescript": "3.6.4",
     "yargs": "14.2.0"
   },
   "devDependencies": {
+    "@bazel/hide-bazel-files": "1.1.0",
+    "@bazel/jasmine": "1.1.0",
+    "@bazel/typescript": "1.1.0",
     "@types/jasmine": "3.5.0",
     "@types/node": "12.7.8",
-    "jasmine": "3.5.0",
-    "mock-fs": "4.10.4",
-    "ts-node": "8.4.1"
-  },
-  "scripts": {
-    "build": "tsc -p .",
-    "test": "ts-node ./node_modules/.bin/jasmine './test/**/*.spec.ts'",
-    "gen": "ts-node src/index.ts"
+    "mock-fs": "4.10.4"
   },
   "license": "MIT"
 }

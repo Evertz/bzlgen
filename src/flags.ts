@@ -1,5 +1,5 @@
 import { lstatSync, readFileSync } from 'fs';
-import { isAbsolute, resolve } from 'path';
+import { isAbsolute, join, resolve } from 'path';
 import * as yargs from 'yargs';
 
 import { NgGeneratorFlags } from './generators/ng/ng.generator.flags';
@@ -187,9 +187,17 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
 
   if (!ignorerc) {
     try {
-      if (lstatSync(RC_FILE_NAME).isFile()) {
+      // if we are running under bazel, then load the rc file using the runfiles helper
+      let rcpath = RC_FILE_NAME;
+      const runfilesHelper = process.env.BAZEL_NODE_RUNFILES_HELPER;
+      if (runfilesHelper) {
+        const f = require(runfilesHelper);
+        rcpath = (f.manifest as Map<string, string>).get(`${process.env.BAZEL_WORKSPACE}/${RC_FILE_NAME}`);
+      }
+
+      if (lstatSync(rcpath).isFile()) {
         if (isDebug) {
-          debug(`Loading args from ${RC_FILE_NAME}`);
+          debug(`Loading args from ${rcpath}`);
         }
 
         const rc = readFileSync(RC_FILE_NAME, { encoding: 'utf-8' })
@@ -253,7 +261,10 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       type: 'string',
       description: 'Base dir that is prefixed to \'path\' to form an absolute path',
       default: resolve(__dirname, '..'),
-      coerce: arg => isAbsolute(arg) ? arg : resolve(__dirname, '..', arg),
+      coerce: arg => {
+        const bazelWorkspaceDir = process.env.BUILD_WORKSPACE_DIRECTORY;
+        return isAbsolute(arg) ? arg : bazelWorkspaceDir ? join(bazelWorkspaceDir, arg) : resolve(__dirname, '..', arg);
+      },
       requiresArg: true,
       group: 'Configuration'
     })

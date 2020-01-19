@@ -5,8 +5,8 @@ import { BuildFileGenerator } from './generators/generator';
 import { NgGenerator } from './generators/ng/ng.generator';
 import { SassGenerator } from './generators/sass/sass.generator';
 import { TsGenerator } from './generators/ts/ts.generator';
-import { debug, error, fatal, isDebugEnabled, lb, log, warn } from './logger';
-import { snapshot, wrap, writeTracingProfile, TRACER_PATH } from './tracing';
+import { debug, fatal, lb, log, warn } from './logger';
+import { snapshot, wrap, TRACER_PATH } from './tracing';
 import { Workspace } from './workspace';
 
 function printFlags(flags: Flags) {
@@ -37,8 +37,8 @@ function getGenerator(type: GeneratorType, workspace: Workspace): BuildFileGener
   }
 }
 
-async function run() {
-  const flags: Flags = setupAndParseArgs(process.argv);
+export async function run() {
+  const flags: Flags = setupAndParseArgs(process.argv, process.argv.includes('--no-rc'));
 
   if (flags.debug) {
     debug(`Writing tracer profile to '${TRACER_PATH}'`);
@@ -84,11 +84,3 @@ async function run() {
     throw new Error('Invalid configuration or flags found');
   }
 }
-
-run()
-  .catch(err => {
-    error(err.message);
-    writeTracingProfile();
-
-    fatal('Please report this error');
-  });

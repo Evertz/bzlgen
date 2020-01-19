@@ -7,7 +7,7 @@ describe('workspace', () => {
   let pathWorkspace: Workspace;
   let fileWorkspace: Workspace;
 
-  beforeAll(() => {
+  beforeEach(() => {
     const argv = [
       '--base_dir=/home/workspace',
       '--no-assert_is_bazel_workspace',
@@ -44,7 +44,7 @@ describe('workspace', () => {
     });
   });
 
-  afterAll(() => mockfs.restore());
+  afterEach(() => mockfs.restore());
 
   describe('path resolution', () => {
     it('resolves absolute path', () => {
