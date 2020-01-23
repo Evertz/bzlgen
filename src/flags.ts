@@ -218,6 +218,8 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
     lb();
   }
 
+  const bazelWorkspaceDir = process.env.BUILD_WORKSPACE_DIRECTORY;
+
   const parser = yargs
     .command({
       command: '$0 <type> <path>',
@@ -260,10 +262,10 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
     .option('base_dir', {
       type: 'string',
       description: 'Base dir that is prefixed to \'path\' to form an absolute path',
-      default: resolve(__dirname, '..'),
+      default: bazelWorkspaceDir ? bazelWorkspaceDir : process.cwd(),
       coerce: arg => {
-        const bazelWorkspaceDir = process.env.BUILD_WORKSPACE_DIRECTORY;
-        return isAbsolute(arg) ? arg : bazelWorkspaceDir ? join(bazelWorkspaceDir, arg) : resolve(__dirname, '..', arg);
+        return isAbsolute(arg) ? arg :
+          bazelWorkspaceDir ? join(bazelWorkspaceDir, arg) : resolve(process.cwd(), arg);
       },
       requiresArg: true,
       group: 'Configuration'
