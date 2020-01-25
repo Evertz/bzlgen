@@ -1,2 +1,5 @@
 build --strategy=TypeScriptCompile=worker
 test --test_output=errors
+
+build:release --stamp
+build:release --workspace_status_command=./tools/bazel_stamp_vars.sh
