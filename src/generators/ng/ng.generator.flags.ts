@@ -6,7 +6,7 @@ export function setupGeneratorCommand(y) {
   return y.option('ng_generate_theme_binary', {
     type: 'boolean',
     description: 'Generate sass_binary rules for .theme.scss files',
-    default: false,
+    default: true,
     group: 'Ng Generator'
   }).option('ng_module_bundle_load', {
     type: 'string',
