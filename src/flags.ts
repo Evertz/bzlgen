@@ -109,6 +109,13 @@ interface CommonFlags {
    */
   default_visibility: string;
 
+  /**
+   * If true, bazel query will be used to determine a source files label
+   * If the label can't be resolved via query, bzlgen will fall back to the best guess
+   * Label mappings will always be resolved first
+   */
+  use_bazel_query: boolean;
+
   /*
    * Verbosity Flags
    * Affects logging
@@ -341,6 +348,11 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       description: 'Ignores spec files from import resolution and generation',
       default: true
     })
+    .option('use_bazel_query', {
+      type: 'boolean',
+      description: 'Use bazel query to try and resolve labels for source files',
+      default: false
+    })
     // verbosity flags
     .option('canonicalize_flags', {
       type: 'boolean',
@@ -382,7 +394,7 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
     .option('bzl_binary', {
       type: 'string',
       description: 'The name (or path) to use for the bazel binary',
-      default: 'bzl',
+      default: 'bazel',
       requiresArg: true,
       group: 'Finalization'
     })
