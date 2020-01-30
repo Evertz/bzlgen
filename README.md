@@ -46,6 +46,14 @@ mapping between a source file and its label. Labels mappings are always the rela
 
 Imports can be ignored by setting the path to a blank label
 
+#### Bazel Query
+
+The generator has experimental use of `bazel query` to attempt to resolve source files to labels. This can be useful if
+BUILD files have already been generated in the repo.
+Mappings added via the `--label_mapping` flag will have priority over any query results or best guess label generation.
+
+The `--use_bazel_query` can be set to opt-in to this behaviour
+
 ### .bzlgenrc
 As bzl-gen has a large number of flags, and can read them from a `.bzlgenrc` file in the root of the repo when to command is run.
 As load sites can be customized for all rules, it's recommended that the default load sites are added to the rc file.

@@ -7,6 +7,7 @@ import { Workspace } from '../../src/workspace';
 describe('ng generator', () => {
   const TS_ONE =
     `import { component } from '@angular/core';
+import { Foo } from '../other/foo';
 import * as r from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -29,6 +30,7 @@ export class Some {}
       '--no-assert_is_bazel_workspace',
       '--load_mapping=ts_library=@npm_bazel_typescript//:index.bzl',
       '--label_mapping=rxjs/operators=@npm//rxjs',
+      '--label_mapping=src/other/foo.ts=//mapped/label',
       '--ts_config_label=//:tsconfig'
     ];
 
@@ -42,6 +44,9 @@ export class Some {}
         'component.component.scss': '',
         'component.component.html': '',
         'component.theme.scss': ''
+      },
+      '/home/workspace/src/other': {
+        'foo.ts': '',
       }
     });
   });
@@ -57,7 +62,7 @@ export class Some {}
       'new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__\n' +
       'new ts_library some|//src/some:__pkg__\n' +
       'add srcs one.ts two.ts|//src/some:some\n' +
-      'add deps @npm//@angular/core:core @npm//rxjs:rxjs|//src/some:some\n' +
+      'add deps @npm//@angular/core:core //mapped/label:label @npm//rxjs:rxjs|//src/some:some\n' +
       'set tsconfig "//:tsconfig"|//src/some:some';
 
     expect(commands.join('\n')).toEqual(expected);

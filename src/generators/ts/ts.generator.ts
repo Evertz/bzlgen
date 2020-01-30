@@ -114,7 +114,7 @@ export class TsGenerator extends BuildFileGenerator {
     }
 
     if (imp.startsWith('.')) {
-      label = this.workspace.getLabelForFile(imp);
+      label = this.workspace.getLabelForFile(imp + '.ts');
       if (label) { return label; }
     }
 

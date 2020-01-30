@@ -12,6 +12,7 @@ import { debug, fatal, isDebugEnabled, lb, log, warn } from './logger';
 export class Workspace {
   private readonly buildozer: Buildozer;
   private readonly labels: Map<string, string>;
+  private readonly fileQueryResultCache: Map<string, Label> = new Map<string, Label>();
 
   private listing: Readonly<string[]>;
 
@@ -128,9 +129,9 @@ export class Workspace {
   getLabelFor(path: string, target?: string): Label {
     path = this.resolveRelativeToWorkspace(path);
 
-    const tryLabel = this.tryResolveLabelFromStaticMapping(path);
-    if (tryLabel) {
-      return tryLabel;
+    const staticLabel = this.tryResolveLabelFromStaticMapping(path);
+    if (staticLabel) {
+      return staticLabel;
     }
 
     let label = lstatSync(this.resolveAbsolute(path)).isFile() ? parse(path).dir : path;
@@ -151,9 +152,16 @@ export class Workspace {
   getLabelForFile(path: string, suffix?: string, stripFileExt = true): Label {
     path = this.resolveRelativeToWorkspace(path);
 
-    const tryLabel = this.tryResolveLabelFromStaticMapping(path);
-    if (tryLabel) {
-      return tryLabel;
+    const staticLabel = this.tryResolveLabelFromStaticMapping(path);
+    if (staticLabel) {
+      return staticLabel;
+    }
+
+    if (this.flags.use_bazel_query) {
+      const queryLabel = this.queryForFile(path);
+      if (queryLabel) {
+        return queryLabel;
+      }
     }
 
     const parsed = parse(path);
@@ -349,16 +357,38 @@ export class Workspace {
     }
   }
 
-  private mergeMappingIntoMap(mapping: { [key: string]: string }, map: Map<string, string>): Map<string, string> {
-    if (!mapping) { return map; }
+  private queryForFile(file: string): Label {
+    if (this.fileQueryResultCache.has(file)) {
+      return this.fileQueryResultCache.get(file);
+    }
 
-    Object.entries(mapping)
-      .forEach(entry => {
-        if (!map.has(entry[0])) {
-          map.set(entry[0], entry[1]);
-        }
-      });
+    const parts = file.split('/');
+    const name = parts.pop();
 
-    return map;
+    const label = `//${parts.join('/')}:${name}`;
+
+    debug(`Query for containing rule with for file ${file}`);
+
+    const term = `"attr('src', ${label}, //...)"`;
+    const term2 = `"attr('srcs', ${label}, //...)"`;
+
+    const queryFlags = `--output label --order_output=no`;
+
+    const result = shell.exec(
+      `${this.flags.bzl_binary} query ${queryFlags} ${term} + ${term2}`,
+      { cwd: this.getFlags().base_dir, silent: !this.flags.debug }
+    );
+
+    if (result.code === 0) {
+      const rule = result.stdout.trim();
+
+      if (rule.length) {
+        const label = Label.parseAbsolute(rule);
+        this.fileQueryResultCache.set(file, label);
+
+        return label;
+      }
+    }
   }
+
 }
