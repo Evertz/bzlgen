@@ -25,4 +25,18 @@ describe('buildozer', () => {
 
     expect(commands.join('\n')).toBe(expected);
   });
+
+  it('can merge default load sites with overrides', () => {
+    const loads = new Map([['ts_library', '//tools/bazel/defaults.bzl']]);
+    const buildozer = new Buildozer(loads);
+
+    const sass = buildozer.getRuleLoadSite('sass_binary');
+    expect(sass).toEqual('@io_bazel_rules_sass//sass:sass.bzl');
+
+    const ts = buildozer.getRuleLoadSite('ts_library');
+    expect(ts).toEqual('//tools/bazel/defaults.bzl');
+
+    const unknown = buildozer.getRuleLoadSite('foo');
+    expect(unknown).toBeUndefined();
+  });
 });

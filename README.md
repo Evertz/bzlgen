@@ -26,13 +26,13 @@ To generate BUILD files using bzlgen from source with bazel, set `--base_dir` to
 There are many option other flags that can be set to customize the output of the generator, see `--help` for more
 
 ### Mapping rules to load statements
-By default, the generator won't load rules into the build file. However this can be changed by setting `load_mapping` flags 
+By default, the generator will load rules from the workspace. However this can be changed by setting `load_mapping` flags 
 This tells the generator where to load a given rule from.
 
-This will load `sass_library` from `@io_bazel_rules_sass//sass:sass.bzl`. This allows those with marcos overriding rule definitions to specify
+This will load `sass_library` from `//tools/defaults.bzl`. This allows those with marcos overriding rule definitions to specify
 the correct load site
 ```
---load_mapping=sass_library=@io_bazel_rules_sass//sass:sass.bzl
+--load_mapping=sass_library=//tools/defaults.bzl
 ```
 
 ### Mapping sources to labels
@@ -55,16 +55,13 @@ Mappings added via the `--label_mapping` flag will have priority over any query 
 The `--use_bazel_query` can be set to opt-in to this behaviour
 
 ### .bzlgenrc
-As bzl-gen has a large number of flags, and can read them from a `.bzlgenrc` file in the root of the repo when to command is run.
-As load sites can be customized for all rules, it's recommended that the default load sites are added to the rc file.
+As bzlgen has a large number of flags, it can read them from a `.bzlgenrc` file in the root of the repo when to command is run.
 
 Each line should contain one flag, all lines are processed, except those starting with `#`
 ```
 # load mappings
---load_mapping=sass_library=@io_bazel_rules_sass//sass:sass.bzl
---load_mapping=sass_binary=@io_bazel_rules_sass//sass:sass.bzl
---load_mapping=ts_library=@npm_bazel_typescript//:defs.bzl
---load_mapping=ng_module=@npm_angular_bazel//:index.bzl
+--load_mapping=sass_library=//tools/defaults.bzl
+--load_mapping=sass_binary=//tools/defaults.bzl
 
 # label mappings
 --label_mapping=rxjs/operators=@npm//rxjs
