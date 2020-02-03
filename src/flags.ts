@@ -322,7 +322,8 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       type: 'string',
       description: 'The name to use for bazel build files',
       default: 'BUILD',
-      group: 'Configuration'
+      group: 'Configuration',
+      choices: ['BUILD', 'BUILD.bazel']
     })
     .option('buildozer_commands_file', {
       type: 'string',
