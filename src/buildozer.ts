@@ -4,13 +4,23 @@
  */
 import { Label } from './label';
 
+const DEFAULT_LOAD_SITES = new Map<string, string>([
+  ['sass_library', '@io_bazel_rules_sass//sass:sass.bzl'],
+  ['sass_binary', '@io_bazel_rules_sass//sass:sass.bzl'],
+  ['ts_library', '@npm_bazel_typescript//:defs.bzl'],
+  ['ng_module', '@npm_angular_bazel//:index.bzl'],
+]);
+
 export class Buildozer {
   private static readonly PKG = '__pkg__';
 
+  private readonly ruleLoadSites: ReadonlyMap<string, string>;
   private readonly commands: Set<string> = new Set<string>();
   private readonly rules: Set<string> = new Set();
 
-  constructor(private readonly ruleLoadSites: Map<string, string>) {}
+  constructor(loads: Map<string, string>) {
+    this.ruleLoadSites = this.mergeWithDefaultLoads(loads);
+  }
 
   loadSassLibrary(label: Label) {
     this.loadRule('sass_library', label);
@@ -29,9 +39,14 @@ export class Buildozer {
   }
 
   loadRule(type: string, label: Label) {
-    if (!this.ruleLoadSites.has(type)) { return; }
-    const from = this.ruleLoadSites.get(type);
+    const from = this.getRuleLoadSite(type);
+    if (!from) { return; }
+
     this.newLoad(from, type, label);
+  }
+
+  getRuleLoadSite(type: string): string {
+    return this.ruleLoadSites.get(type);
   }
 
   newSassLibraryRule(label: Label) {
@@ -182,6 +197,7 @@ export class Buildozer {
 
   // lower level
   newLoad(from: string, symbols: string, label: Label) {
+    if (!from) { return; }
     this.commands.add(`new_load ${from} ${symbols}|${label.withTarget(Buildozer.PKG)}`);
   }
 
@@ -199,5 +215,18 @@ export class Buildozer {
 
   hasRule(name: string): boolean {
     return this.rules.has(name);
+  }
+
+  private mergeWithDefaultLoads(source: Map<string, string>): Map<string, string> {
+    const result = new Map<string, string>();
+    DEFAULT_LOAD_SITES.forEach((value: string, key: string) => {
+      if (source.has(key)) {
+        result.set(key, source.get(key));
+      } else {
+        result.set(key, value);
+      }
+    });
+
+    return result;
   }
 }
