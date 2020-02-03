@@ -24,6 +24,8 @@
     "@bazel/jasmine": "1.1.0",
     "@bazel/typescript": "1.1.0",
     "@types/jasmine": "3.5.0",
+    "@types/shelljs": "0.8.6",
+    "@types/mock-fs": "4.10.0",
     "@types/node": "12.7.8",
     "mock-fs": "4.10.4"
   },

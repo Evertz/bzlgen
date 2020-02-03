@@ -12,6 +12,7 @@ ts_library(
         "@npm//@types/node",
         "@npm//jasmine",
         "@npm//mock-fs",
+        "@npm//@types/mock-fs",
     ],
 )
 

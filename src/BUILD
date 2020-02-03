@@ -21,6 +21,7 @@ ts_library(
     ],
     deps = [
         "@npm//@types/node",
+        "@npm//@types/shelljs",
     ] + RUNTIME_NPM_DEPS,
     module_name = "@evertz/bzlgen/src",
 )

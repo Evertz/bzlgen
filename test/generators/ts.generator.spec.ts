@@ -36,7 +36,10 @@ export class Some {}
 
     workspace = new Workspace(setupAndParseArgs(argv, true, 0));
     gen = new TsGenerator(workspace);
+  })
 
+  afterEach(() => mockfs.restore());
+  it('can generate ts_library with deps', async () => {
     mockfs({
       '/home/workspace/src/some': {
         'one.ts': TS_ONE,
@@ -49,12 +52,8 @@ export class Some {}
         'foo.ts': '',
       }
     });
-  });
 
-  afterEach(() => mockfs.restore());
-
-  it('can generate ts_library with deps', () => {
-    gen.generate();
+    await gen.generate();
 
     const commands = workspace.getBuildozer().toCommands();
 
@@ -67,4 +66,25 @@ export class Some {}
 
     expect(commands.join('\n')).toEqual(expected);
   });
+
+  it('can strip all deep imports', async () => {
+    mockfs({
+      '/home/workspace/src/some': {
+        'one.ts': `import {} from 'package'; import {} from 'package/deep'; import {} from '@scope/package';  import {} from '@scope/package/deep';`
+      },
+    },);
+
+    await gen.generate();
+
+    const commands = workspace.getBuildozer().toCommands();
+
+    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+new ts_library some|//src/some:__pkg__
+add srcs one.ts|//src/some:some
+add deps @npm//package:package @npm//@scope/package:package|//src/some:some
+set tsconfig "//:tsconfig"|//src/some:some`
+
+    expect(commands.join('\n')).toEqual(expected);
+  });
+
 });
