@@ -1,5 +1,4 @@
-import { parse } from 'path';
-
+import { parse, posix } from 'path';
 import { tsquery } from '@phenomnomnominal/tsquery';
 import { ExportDeclaration, Expression, ImportDeclaration, SourceFile } from 'typescript';
 import { Buildozer } from '../../buildozer';
@@ -106,20 +105,29 @@ export class TsGenerator extends BuildFileGenerator {
     let label = this.workspace.tryResolveLabelFromStaticMapping(imp, undefined, '.');
     if (label) { return label; }
 
-    // some imports are deep but resolve to one label (eg material and cdk)
-    if (imp.startsWith('@angular/material')) {
-      return Label.parseAbsolute(`@${npmWorkspace}//@angular/material`);
-    } else if (imp.startsWith('@angular/cdk')) {
-      return Label.parseAbsolute(`@${npmWorkspace}//@angular/material`);
-    }
+    const relative = this.workspace.isWorkspaceRelative(imp) || imp.startsWith('.');
 
-    if (imp.startsWith('.')) {
+    if (relative) {
       label = this.workspace.getLabelForFile(imp + '.ts');
       if (label) { return label; }
-    }
 
-    // fall back to assuming 3rd_party
-    return Label.parseAbsolute(`@${npmWorkspace}//${imp}`);
+      throw new Error (`Unable to generate label for: ${imp}`)
+    } else {
+      // module specifiers do not use system seperators
+      // they always use forward slashes
+      const pathParts = imp.split(posix.sep);
+      // remove any deep imports by stripping any paths past the end of the package name
+      let reducedPathed: string;
+      if(imp.startsWith('@')) {
+        // a scoped npm package cannot have more than two segments
+        reducedPathed = posix.join(...pathParts.slice(0, 2));
+      } else {
+        // a normal npm package cannot have more than one segment
+        reducedPathed = posix.join(...pathParts.slice(0, 1));
+
+      }
+      return Label.parseAbsolute(`@${npmWorkspace}//${reducedPathed}`);
+    }
   }
 
 }

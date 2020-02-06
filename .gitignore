@@ -1,3 +1,5 @@
 node_modules
 bazel-*
 .idea
+yarn-error.log
+.vscode
