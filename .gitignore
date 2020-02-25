@@ -1,5 +1,7 @@
 node_modules
 bazel-*
 .idea
-yarn-error.log
+.ijwb
 .vscode
+yarn-error.log
+tools/bazel_version
