@@ -11,7 +11,8 @@ describe('workspace', () => {
     const argv = [
       '--base_dir=/home/workspace',
       '--no-assert_is_bazel_workspace',
-      '--label_mapping=src/baz=//other'
+      '--label_mapping=src/baz=//other',
+      '--label_mapping=src/foo/*=//fother'
     ];
 
     const pathArgv = [
@@ -33,8 +34,12 @@ describe('workspace', () => {
     mockfs({
       '/home/workspace': {
         src: {
-          component: { 'foo.component.scss': '' },
-          foo: {},
+          component: {
+            'foo.component.scss': ''
+          },
+          foo: {
+            'some-file.ts': ''
+          },
           baz: {}
         },
         test: {
@@ -115,6 +120,11 @@ describe('workspace', () => {
     it('can resolve static label mappings', () => {
       expect(pathWorkspace.getLabelFor('../baz').toString()).toBe('//other:other');
       expect(fileWorkspace.getLabelFor('../baz').toString()).toBe('//other:other');
+    });
+
+    it('can resolve static label mappings with globs', () => {
+      // without the glob this resolves to //src/foo:foo
+      expect(pathWorkspace.getLabelFor('../foo/some-file.ts').toString()).toBe('//fother:fother');
     });
 
     it('can resolve labels for files', () => {

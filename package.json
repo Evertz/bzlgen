@@ -14,6 +14,7 @@
     "@phenomnomnominal/tsquery": "3.0.0",
     "gonzales-pe": "4.2.4",
     "lodash.kebabcase": "4.1.1",
+    "minimatch": "3.0.4",
     "shelljs": "0.8.3",
     "signale": "1.4.0",
     "typescript": "3.6.4",
@@ -24,9 +25,10 @@
     "@bazel/jasmine": "1.1.0",
     "@bazel/typescript": "1.1.0",
     "@types/jasmine": "3.5.0",
-    "@types/shelljs": "0.8.6",
+    "@types/minimatch": "3.0.3",
     "@types/mock-fs": "4.10.0",
     "@types/node": "12.7.8",
+    "@types/shelljs": "0.8.6",
     "mock-fs": "4.10.4"
   },
   "license": "MIT"
