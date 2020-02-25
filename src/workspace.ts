@@ -3,6 +3,7 @@ import * as kebabCase from 'lodash.kebabcase';
 import { isAbsolute, join, normalize, parse, sep, ParsedPath } from 'path';
 import * as shell from 'shelljs';
 import * as util from 'util';
+import * as minimatch from 'minimatch';
 
 import { Buildozer } from './buildozer';
 import { Flags } from './flags';
@@ -11,21 +12,28 @@ import { debug, fatal, isDebugEnabled, lb, log, warn } from './logger';
 
 export class Workspace {
   private readonly buildozer: Buildozer;
-  private readonly labels: Map<string, string>;
+
+  private readonly staticLabels: Map<RegExp, string>;
+  private readonly resolvedStaticLabelsCache: Map<string, Label> = new Map<string, Label>();
+
   private readonly fileQueryResultCache: Map<string, Label> = new Map<string, Label>();
 
   private listing: Readonly<string[]>;
 
   constructor(private readonly flags: Flags) {
     this.buildozer = new Buildozer(this.flags.load_mapping);
-    this.labels = this.flags.label_mapping;
 
+    const regexLabels: Array<[RegExp, string]> = Array.from(this.flags.label_mapping.entries())
+      .map(pair => [minimatch.makeRe(pair[0]), pair[1]]);
+
+    this.staticLabels = new Map(regexLabels);
+    
     if (isDebugEnabled) {
       debug('Rule load sites loaded:');
       debug(util.inspect(this.flags.load_mapping));
       lb();
       debug('Static label mappings loaded:');
-      debug(util.inspect(this.labels));
+      debug(util.inspect(this.staticLabels));
       lb();
     }
   }
@@ -301,12 +309,25 @@ export class Workspace {
       imp = this.resolveRelativeToWorkspace(imp);
     }
 
-    if (!this.labels.has(imp)) {
+    if (this.resolvedStaticLabelsCache.has(imp)) {
+      return this.resolvedStaticLabelsCache.get(imp);
+    }
+
+    // find returns the first found truthy match, so there _may_ be a more speciffic glob in the map
+    // but we won't find it - room for improvement, but the consumer can move them up the list
+    const result = Array.from(this.staticLabels.entries())
+      .find(([key, _]) => !!key.exec(imp));
+
+    if (!result) {
       return defaultValue ? Label.parseAbsolute(defaultValue) : undefined;
     }
 
-    const label = this.labels.get(imp);
-    return Label.parseAbsolute(label);
+    const staticMaped = result[1];
+    const label = Label.parseAbsolute(staticMaped);
+
+    this.resolvedStaticLabelsCache.set(imp, label);
+
+    return label;
   }
 
   /**

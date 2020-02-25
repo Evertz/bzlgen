@@ -9,6 +9,7 @@ RUNTIME_NPM_DEPS = [
     "@npm//gonzales-pe",
     "@npm//@phenomnomnominal/tsquery",
     "@npm//typescript",
+    "@npm//minimatch",
 ]
 
 ts_library(
@@ -22,6 +23,7 @@ ts_library(
     deps = [
         "@npm//@types/node",
         "@npm//@types/shelljs",
+        "@npm//@types/minimatch",
     ] + RUNTIME_NPM_DEPS,
     module_name = "@evertz/bzlgen/src",
 )

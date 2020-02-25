@@ -44,6 +44,13 @@ mapping between a source file and its label. Labels mappings are always the rela
 --label_mapping path/to/src/component.ts=//some/other:label
 ```
 
+Mappings can also contain glob patterns, allowing many paths or subpaths to be mapped to a specific label.
+The example below will map all files in the `path/to` subdirectory to the label `//:foo`
+
+```
+--label_mapping path/to/**/*=//:foo
+```
+
 Imports can be ignored by setting the path to a blank label
 
 #### Bazel Query
