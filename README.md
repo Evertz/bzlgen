@@ -15,15 +15,25 @@ It will try and 'best guess' labels from other packages. It's currently not expe
 but will (in most cases) generate a ~80-90% best effort and reduce the boilerplate needed.
 
 #### Running the generator
-The generator can be run from source via bazel:
+bzlgen can be installed from npm. If you don't have [buildozer](https://github.com/bazelbuild/buildtools/tree/master/buildozer) on your path, it can install that via npm too
+```
+npm i -g @evertz/bzlgen
+
+npm i -g @bazel/buildozer
+```
+
+Then run the generator, passing the type to generate and the path or file to generate for (not all generators support single files or directories)
 
 ```
-bazel run //src:bin -- ts examples/ --base_dir=/usr/workspaces/project
+bzlgen ng ./home
 ```
-
-To generate BUILD files using bzlgen from source with bazel, set `--base_dir` to the absolute path of the target directory 
 
 There are many option other flags that can be set to customize the output of the generator, see `--help` for more
+
+The generator can also be run from source if needed:
+```
+bazel run //src:bin -- --help
+```
 
 ### Mapping rules to load statements
 By default, the generator will load rules from the workspace. However this can be changed by setting `load_mapping` flags 
