@@ -10,6 +10,7 @@ RUNTIME_NPM_DEPS = [
     "@npm//@phenomnomnominal/tsquery",
     "@npm//typescript",
     "@npm//minimatch",
+    "@npm//tsconfig-paths",
 ]
 
 ts_library(

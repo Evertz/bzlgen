@@ -1,6 +1,17 @@
-import { GeneratorType } from '../flags';
+import { Flags, GeneratorType } from '../flags';
+import { Workspace } from '../workspace';
+import { Buildozer } from '../buildozer';
 
 export abstract class BuildFileGenerator {
+  private readonly flags: Flags;
+
+  protected readonly buildozer: Buildozer;
+
+  protected constructor(protected readonly workspace: Workspace) {
+    this.buildozer = workspace.getBuildozer();
+    this.flags = workspace.getFlags();
+  }
+
   /**
    * Run any validation rules here on the current flags or workspace
    * If an error is thrown then the message is printed to the user and the generator exits with code 1,

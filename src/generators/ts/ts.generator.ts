@@ -1,7 +1,17 @@
 import { parse, posix } from 'path';
 import { tsquery } from '@phenomnomnominal/tsquery';
-import { ExportDeclaration, Expression, ImportDeclaration, SourceFile } from 'typescript';
-import { Buildozer } from '../../buildozer';
+import {
+  ExportDeclaration,
+  Expression,
+  ImportDeclaration,
+  ParseConfigHost,
+  parseJsonSourceFileConfigFileContent,
+  readJsonConfigFile,
+  SourceFile,
+  sys
+} from 'typescript';
+import { createMatchPath, MatchPath } from 'tsconfig-paths';
+
 import { GeneratorType } from '../../flags';
 import { Label } from '../../label';
 import { fatal, log } from '../../logger';
@@ -12,11 +22,12 @@ const IMPORTS_QUERY = `ImportDeclaration:has(StringLiteral)`;
 const EXPORTS_QUERY = `ExportDeclaration:has(StringLiteral)`;
 
 export class TsGenerator extends BuildFileGenerator {
-  protected readonly buildozer: Buildozer;
+  protected readonly tsPathsMatcher: MatchPath;
 
-  constructor(protected readonly workspace: Workspace) {
-    super();
-    this.buildozer = workspace.getBuildozer();
+  constructor(workspace: Workspace) {
+    super(workspace);
+
+    this.tsPathsMatcher = this.createPathMatcherForTsPaths();
   }
 
   async generate(): Promise<void> {
@@ -102,6 +113,9 @@ export class TsGenerator extends BuildFileGenerator {
   }
 
   private calculateTsDependencyLabel(imp: string, npmWorkspace: string): Label | undefined {
+    // see if there is a tsconfig.json, and if we need to adjust the import
+    imp = this.tryResolveFromTsPaths(imp);
+
     let label = this.workspace.tryResolveLabelFromStaticMapping(imp, undefined, '.');
     if (label) { return label; }
 
@@ -130,4 +144,41 @@ export class TsGenerator extends BuildFileGenerator {
     }
   }
 
+  private tryResolveFromTsPaths(imp: string): string {
+    if (!this.tsPathsMatcher) {
+      return imp;
+    }
+
+    const path = this.tsPathsMatcher(imp, undefined, undefined, ['.ts']);
+    return path ? path.replace(this.workspace.getFlags().base_dir + '/', '') : imp;
+  }
+
+  private createPathMatcherForTsPaths(): MatchPath | undefined {
+    if (!this.workspace.getFlags().ts_config) {
+      return;
+    }
+
+    const tsconfigPath = this.workspace.resolveRelativeToWorkspace(this.workspace.getFlags().ts_config);
+    const tsConfigSourceFile = readJsonConfigFile(tsconfigPath, path => this.workspace.readFile(path));
+
+    if (!tsConfigSourceFile) {
+      throw new Error(`--ts_config flag set, but failed to load tsconfig.json from ${tsconfigPath}`);
+    }
+
+    const parseConfigHost: ParseConfigHost = {
+      fileExists: sys.fileExists,
+      readFile: path => this.workspace.readFile(path),
+      readDirectory: sys.readDirectory,
+      useCaseSensitiveFileNames: true
+    };
+
+    const parsed = parseJsonSourceFileConfigFileContent(tsConfigSourceFile, parseConfigHost, this.workspace.getPath());
+
+    // we _could_ throw parse errors here, but it may be not worth it if we can access the paths attr
+    if (!parsed.options.paths) {
+      return;
+    }
+
+    return createMatchPath(this.workspace.getAbsolutePath(), parsed.options.paths);
+  }
 }

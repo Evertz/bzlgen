@@ -3,6 +3,7 @@ import * as mockfs from 'mock-fs';
 import { setupAndParseArgs } from '../../src/flags';
 import { TsGenerator } from '../../src/generators/ts/ts.generator';
 import { Workspace } from '../../src/workspace';
+import { TsGeneratorFlags } from '../../src/generators/ts/ts.generator.flags';
 
 describe('ng generator', () => {
   const TS_ONE =
@@ -36,9 +37,10 @@ export class Some {}
 
     workspace = new Workspace(setupAndParseArgs(argv, true, 0));
     gen = new TsGenerator(workspace);
-  })
+  });
 
   afterEach(() => mockfs.restore());
+
   it('can generate ts_library with deps', async () => {
     mockfs({
       '/home/workspace/src/some': {
@@ -67,6 +69,38 @@ export class Some {}
     expect(commands.join('\n')).toEqual(expected);
   });
 
+  it('can use tsconfig paths', async () => {
+    mockfs({
+      '/home/workspace': {
+        src: {
+          some: {
+            nested: {
+              'main.ts': ''
+            },
+            'one.ts': `import { BAR } from '@foo/main'`,
+            'tsconfig.json': `{"compilerOptions":{"paths":{"@foo/*":["nested/*"]}}}`
+          }
+        }
+      },
+    });
+
+    (workspace.getFlags() as TsGeneratorFlags).ts_config = 'tsconfig.json';
+    gen = new TsGenerator(workspace);
+
+    await gen.generate();
+
+    const commands = workspace.getBuildozer().toCommands();
+
+    const expected =
+      'new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__\n' +
+      'new ts_library some|//src/some:__pkg__\n' +
+      'add srcs one.ts|//src/some:some\n' +
+      'add deps //src/some/nested:main|//src/some:some\n' +
+      'set tsconfig "//:tsconfig"|//src/some:some';
+
+    expect(commands.join('\n')).toEqual(expected);
+  });
+
   it('can strip all deep imports', async () => {
     mockfs({
       '/home/workspace/src/some': {
@@ -82,7 +116,7 @@ export class Some {}
 new ts_library some|//src/some:__pkg__
 add srcs one.ts|//src/some:some
 add deps @npm//package:package @npm//@scope/package:package|//src/some:some
-set tsconfig "//:tsconfig"|//src/some:some`
+set tsconfig "//:tsconfig"|//src/some:some`;
 
     expect(commands.join('\n')).toEqual(expected);
   });

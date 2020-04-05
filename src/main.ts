@@ -72,6 +72,7 @@ export async function run() {
   }
 
   const isValid = generator.validate();
+
   if (isValid) {
     await wrap('generate', async () => await generator.generate());
 
