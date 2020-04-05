@@ -1,20 +1,40 @@
 {
   "name": "@evertz/bzlgen",
   "version": "0.0.0-PLACEHOLDER",
+  "author": {
+    "email": "opensource@evertz.com",
+    "name": ",Evertz Devtools R&D",
+    "url": "https://evertz.com"
+  },
+  "keywords": [
+    "bazel",
+    "generator",
+    "buildozer",
+    "build"
+  ],
   "description": "Bazel Buildozer command file generator written in Typescript",
+  "scripts": {
+    "postinstall": "patch-package",
+    "patch": "patch-package"
+  },
   "repository": {
     "type": "GIT",
     "url": "https://github.com/Evertz/bzlgen"
+  },
+  "bugs": {
+    "url": "https://github.com/Evertz/bzlgen/issues"
   },
   "main": "src/index.js",
   "bin": {
     "bzlgen": "src/bzlgen.js"
   },
   "dependencies": {
+    "@bazel/buildozer": "2.2.1",
     "@phenomnomnominal/tsquery": "3.0.0",
     "gonzales-pe": "4.2.4",
     "lodash.kebabcase": "4.1.1",
     "minimatch": "3.0.4",
+    "patch-package": "6.2.2",
     "shelljs": "0.8.3",
     "signale": "1.4.0",
     "typescript": "3.8.3",

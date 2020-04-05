@@ -1,9 +1,10 @@
-import { lstatSync, readdirSync, readFileSync, writeFileSync } from 'fs';
+import { lstatSync, readdirSync, readFileSync } from 'fs';
 import * as kebabCase from 'lodash.kebabcase';
 import { isAbsolute, join, normalize, parse, sep, ParsedPath } from 'path';
 import * as shell from 'shelljs';
 import * as util from 'util';
 import * as minimatch from 'minimatch';
+import * as BazelBuildozer from '@bazel/buildozer';
 
 import { Buildozer } from './buildozer';
 import { Flags } from './flags';
@@ -334,34 +335,21 @@ export class Workspace {
    * Invokes a buildozer class in the base directory
    */
   invokeBuildozer() {
-    if (!this.flags.buildozer_commands_file) { return; }
+    if (!this.flags.generate_build_files && !this.flags.output_buildozer_to_console) {
+      log(`--no-generate_build_files set, not generating ${this.flags.build_file_name} files`);
+      return;
+    }
 
-    const commands = this.buildozer.toCommands();
+    if (this.flags.output_buildozer_to_console) {
+      log('\n' + this.buildozer.toCommands());
+      return;
+    }
+
+    const commands = this.buildozer.toCommandBatch();
     if (!commands.length) {
       warn('No buildozer commands were generated');
       return;
     }
-
-    const commandsForFile = commands.join('\n');
-    const buildozerCommandsFilePath = join(this.flags.base_dir, this.flags.buildozer_commands_file);
-    writeFileSync(buildozerCommandsFilePath, commandsForFile, { encoding: 'utf-8' });
-
-    if (this.flags.output_buildozer_to_console) {
-      log(`Generated ${commands.length} buildozer commands:`);
-      log('\n' + commandsForFile);
-      lb();
-    }
-
-    if (!this.flags.generate_build_files) {
-      log(`--no-generate_build_files set, not generating ${this.flags.build_file_name} files`);
-      log(`buildozer commands file can be found at ${buildozerCommandsFilePath}`);
-      return;
-    }
-
-    const cmd = `${this.flags.buildozer_binary} -shorten_labels -eol-comments=true -k -f ${buildozerCommandsFilePath}`;
-
-    debug('Invoking buildozer:');
-    debug(cmd);
 
     const hasBuildFileAtPath = this.hasBuildFileAtPath();
     if (hasBuildFileAtPath && this.flags.nuke_build_file) {
@@ -371,10 +359,13 @@ export class Workspace {
       shell.touch(this.getBuildFilePath());
     }
 
-    const result = shell.exec(cmd, { cwd: this.flags.base_dir });
+    debug('Invoking buildozer');
 
-    if ((result.code === 0 || result.code === 3) && this.flags.clean_commands_file) {
-      shell.rm(buildozerCommandsFilePath);
+    try {
+      BazelBuildozer.runWithOptions(commands, { cwd: this.flags.base_dir }, ['-shorten_labels', '-eol-comments=true', '-k']);
+      log(`Generated ${this.flags.build_file_name} files`);
+    } catch (e) {
+      fatal(`Error generating ${this.flags.build_file_name} files`);
     }
   }
 

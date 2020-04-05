@@ -30,6 +30,7 @@ pkg_npm(
         "README.md",
         "LICENSE",
         "index.bzl",
+        "//patches:@bazel+buildozer+2.2.1.patch",
     ],
     deps = [
          "//src",

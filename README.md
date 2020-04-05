@@ -15,11 +15,9 @@ It will try and 'best guess' labels from other packages. It's currently not expe
 but will (in most cases) generate a ~80-90% best effort and reduce the boilerplate needed.
 
 #### Running the generator
-bzlgen can be installed from npm. If you don't have [buildozer](https://github.com/bazelbuild/buildtools/tree/master/buildozer) on your path, it can install that via npm too
+bzlgen can be installed from npm
 ```
 npm i -g @evertz/bzlgen
-
-npm i -g @bazel/buildozer
 ```
 
 Then run the generator, passing the type to generate and the path or file to generate for (not all generators support single files or directories)

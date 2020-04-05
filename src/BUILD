@@ -2,6 +2,7 @@ load("@npm_bazel_typescript//:index.bzl", "ts_library")
 load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
 
 RUNTIME_NPM_DEPS = [
+    "@npm//@bazel/buildozer",
     "@npm//yargs",
     "@npm//signale",
     "@npm//lodash.kebabcase",
