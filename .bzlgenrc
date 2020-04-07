@@ -5,4 +5,4 @@
 --ng_module_bundle_load=//tools/rules_bazel/defs.bzl
 
 # label mappings
---label_mapping=rxjs/operators=@npm//rxjs
+--label_mapping=rxjs/*=@npm//rxjs

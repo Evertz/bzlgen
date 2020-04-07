@@ -1,18 +1,14 @@
 import * as gonzales from 'gonzales-pe';
 import { ParsedPath } from 'path';
 
-import { Buildozer } from '../../buildozer';
 import { GeneratorType } from '../../flags';
 import { log } from '../../logger';
 import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
 
 export class SassGenerator extends BuildFileGenerator {
-  private readonly buildozer: Buildozer;
-
-  constructor(private readonly workspace: Workspace) {
-    super();
-    this.buildozer = workspace.getBuildozer();
+  constructor(workspace: Workspace) {
+    super(workspace);
   }
 
   async generate(): Promise<void> {

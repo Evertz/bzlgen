@@ -13,7 +13,7 @@ import { debug, fatal, isDebugEnabled, lb, log, warn } from './logger';
 export class Workspace {
   private readonly buildozer: Buildozer;
 
-  private readonly staticLabels: Map<RegExp, string>;
+  private readonly staticLabels: Map<string, RegExp>;
   private readonly resolvedStaticLabelsCache: Map<string, Label> = new Map<string, Label>();
 
   private readonly fileQueryResultCache: Map<string, Label> = new Map<string, Label>();
@@ -23,8 +23,8 @@ export class Workspace {
   constructor(private readonly flags: Flags) {
     this.buildozer = new Buildozer(this.flags.load_mapping);
 
-    const regexLabels: Array<[RegExp, string]> = Array.from(this.flags.label_mapping.entries())
-      .map(pair => [minimatch.makeRe(pair[0]), pair[1]]);
+    const regexLabels: Array<[string, RegExp]> = Array.from(this.flags.label_mapping.entries())
+      .map(pair => [pair[1], minimatch.makeRe(pair[0])]);
 
     this.staticLabels = new Map(regexLabels);
     
@@ -313,17 +313,17 @@ export class Workspace {
       return this.resolvedStaticLabelsCache.get(imp);
     }
 
-    // find returns the first found truthy match, so there _may_ be a more speciffic glob in the map
+    // find returns the first found truthy match, so there _may_ be a more specific glob in the map
     // but we won't find it - room for improvement, but the consumer can move them up the list
     const result = Array.from(this.staticLabels.entries())
-      .find(([key, _]) => !!key.exec(imp));
+      .find(([_, value]) => !!value.exec(imp));
 
     if (!result) {
       return defaultValue ? Label.parseAbsolute(defaultValue) : undefined;
     }
 
-    const staticMaped = result[1];
-    const label = Label.parseAbsolute(staticMaped);
+    const staticMapped = result[0];
+    const label = Label.parseAbsolute(staticMapped);
 
     this.resolvedStaticLabelsCache.set(imp, label);
 
