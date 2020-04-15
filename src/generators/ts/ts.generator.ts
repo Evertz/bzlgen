@@ -31,7 +31,7 @@ export class TsGenerator extends BuildFileGenerator {
   }
 
   async generate(): Promise<void> {
-    const files = this.workspace.readDirectory();
+    const files = this.workspace.isDirectory() ? this.workspace.readDirectory() : [this.workspace.getPath()];
     const flags = this.workspace.getFlags();
 
     const tsFiles = files
@@ -42,7 +42,10 @@ export class TsGenerator extends BuildFileGenerator {
     tsFiles
       .forEach(file => this.processFile(file, tsFiles, flags.npm_workspace_name, deps));
 
-    const tsLibrary = this.buildozer.newTsLibraryRule(this.workspace.getLabelForPath())
+    const label = this.workspace.isDirectory() ? this.workspace.getLabelForPath() :
+      this.workspace.getLabelForPath().withTarget(this.workspace.getPathInfo().name);
+
+    const tsLibrary = this.buildozer.newTsLibraryRule(label)
       .setSrcs(tsFiles.map(path => parse(path).base))
       .addDeps(Array.from(deps));
 
@@ -53,14 +56,6 @@ export class TsGenerator extends BuildFileGenerator {
     if (flags.default_visibility) {
       tsLibrary.setVisibility(flags.default_visibility);
     }
-  }
-
-  validate(): boolean {
-    if (!this.workspace.isDirectory()) {
-      fatal('Path passed to Typescript generator must be a directory');
-    }
-
-    return true;
   }
 
   getGeneratorType(): GeneratorType {
