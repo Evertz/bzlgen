@@ -43,7 +43,7 @@ describe('buildozer', () => {
 
     const commands = batch.flatMap(item => item.commands).join('\n');
     const expected =
-      'new_load @npm_bazel_typescript//:defs.bzl ts_library\n' +
+      'new_load @npm_bazel_typescript//:index.bzl ts_library\n' +
       'new ts_library bar\n' +
       'add deps baz\n' +
       'add srcs foo.ts\n' +
