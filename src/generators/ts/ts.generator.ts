@@ -11,10 +11,11 @@ import {
   sys
 } from 'typescript';
 import { createMatchPath, MatchPath } from 'tsconfig-paths';
+import * as Builtins from 'builtins';
 
 import { GeneratorType } from '../../flags';
 import { Label } from '../../label';
-import { fatal, log } from '../../logger';
+import { log } from '../../logger';
 import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
 
@@ -23,10 +24,12 @@ const EXPORTS_QUERY = `ExportDeclaration:has(StringLiteral)`;
 
 export class TsGenerator extends BuildFileGenerator {
   protected readonly tsPathsMatcher: MatchPath;
+  protected readonly builtins: string[] = [];
 
   constructor(workspace: Workspace) {
     super(workspace);
 
+    this.builtins = Builtins();
     this.tsPathsMatcher = this.createPathMatcherForTsPaths();
   }
 
@@ -113,6 +116,12 @@ export class TsGenerator extends BuildFileGenerator {
 
     let label = this.workspace.tryResolveLabelFromStaticMapping(imp, undefined, '.');
     if (label) { return label; }
+
+    // if the module is a builtin, return @types/node
+    // if the import had been overridden it should have happened above
+    if (this.builtins.includes(imp)) {
+      return Label.parseAbsolute(`@${npmWorkspace}//@types/node`);
+    }
 
     const relative = this.workspace.isWorkspaceRelative(imp) || imp.startsWith('.');
 

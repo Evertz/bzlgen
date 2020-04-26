@@ -31,14 +31,15 @@
   "dependencies": {
     "@bazel/buildozer": "2.2.1",
     "@phenomnomnominal/tsquery": "3.0.0",
+    "builtins": "3.0.1",
     "gonzales-pe": "4.2.4",
     "lodash.kebabcase": "4.1.1",
     "minimatch": "3.0.4",
     "patch-package": "6.2.2",
     "shelljs": "0.8.3",
     "signale": "1.4.0",
-    "typescript": "3.8.3",
     "tsconfig-paths": "3.9.0",
+    "typescript": "3.8.3",
     "yargs": "14.2.0"
   },
   "devDependencies": {
