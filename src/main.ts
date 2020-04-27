@@ -2,6 +2,7 @@ import { inspect } from 'util';
 
 import { setupAndParseArgs, Flags, GeneratorType } from './flags';
 import { BuildFileGenerator } from './generators/generator';
+import { NodejsBinaryGenerator } from './generators/js/nodejs-binary.generator';
 import { NgGenerator } from './generators/ng/ng.generator';
 import { SassGenerator } from './generators/sass/sass.generator';
 import { TsGenerator } from './generators/ts/ts.generator';
@@ -32,6 +33,8 @@ function getGenerator(type: GeneratorType, workspace: Workspace): BuildFileGener
     case GeneratorType.NG:
     case GeneratorType.NG_BUNDLE:
       return new NgGenerator(workspace);
+    case GeneratorType.JS_BINARY:
+      return new NodejsBinaryGenerator(workspace);
     default:
       fatal(`No generator found for type ${type}`);
   }

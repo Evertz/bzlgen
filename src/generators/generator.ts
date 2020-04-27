@@ -3,11 +3,10 @@ import { Workspace } from '../workspace';
 import { Buildozer } from '../buildozer';
 
 export abstract class BuildFileGenerator {
-  private readonly flags: Flags;
-
+  protected readonly flags: Flags;
   protected readonly buildozer: Buildozer;
 
-  protected constructor(protected readonly workspace: Workspace) {
+  constructor(protected readonly workspace: Workspace) {
     this.buildozer = workspace.getBuildozer();
     this.flags = workspace.getFlags();
   }

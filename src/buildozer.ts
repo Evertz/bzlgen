@@ -4,8 +4,9 @@ import { Label } from './label';
 const DEFAULT_LOAD_SITES = new Map<string, string>([
   ['sass_library', '@io_bazel_rules_sass//sass:sass.bzl'],
   ['sass_binary', '@io_bazel_rules_sass//sass:sass.bzl'],
-  ['ts_library', '@npm_bazel_typescript//:defs.bzl'],
+  ['ts_library', '@npm_bazel_typescript//:index.bzl'],
   ['ng_module', '@npm_angular_bazel//:index.bzl'],
+  ['nodejs_binary', '@build_bazel_rules_nodejs//:index.bzl'],
 ]);
 
 /**

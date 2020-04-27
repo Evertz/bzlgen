@@ -12,6 +12,8 @@ import { Label } from './label';
 import { debug, fatal, isDebugEnabled, lb, log, warn } from './logger';
 
 export class Workspace {
+  private static readonly QUERY_FLAGS = `--output label --order_output=no`;
+
   private readonly buildozer: Buildozer;
 
   private readonly staticLabels: Map<string, RegExp>;
@@ -153,7 +155,7 @@ export class Workspace {
   }
 
   /**
-   * Returns a best guess attempt at the label for the given file.
+   * Returns a best guess attempt at the label for the rule that the given file is a part of.
    *
    * Allows adding an optional suffix and stripping the file extension,
    * note that the suffix is added after stripping the extension
@@ -185,6 +187,35 @@ export class Workspace {
     }
 
     return this.getLabelFor(parsed.dir, snake);
+  }
+
+  /**
+   * Returns a best guess label for the given file
+   *
+   * Note: This does not take into account BUILD file location, so the label may cross a package boundary
+   *
+   * Unlike getLabelForFile, this method returns the label for the file itself, not the rule in which it resides
+   * @param file
+   */
+  getFileLabel(file: string): Label {
+    if (this.flags.use_bazel_query) {
+      debug(`Query for file ${file}`);
+
+      const result = shell.exec(
+        `${this.flags.bzl_binary} query ${Workspace.QUERY_FLAGS} '${file}'`,
+        { cwd: this.getFlags().base_dir, silent: !this.flags.debug }
+      );
+
+      if (result.code === 0) {
+        const rule = result.stdout.trim();
+        if (rule.length) {
+          return Label.parseAbsolute(rule);
+        }
+      }
+    }
+
+    const parsed = parse(file);
+    return Label.parseAbsolute(`//${parsed.dir}:${parsed.base}`);
   }
 
   /**
@@ -384,10 +415,8 @@ export class Workspace {
     const term = `"attr('src', ${label}, //...)"`;
     const term2 = `"attr('srcs', ${label}, //...)"`;
 
-    const queryFlags = `--output label --order_output=no`;
-
     const result = shell.exec(
-      `${this.flags.bzl_binary} query ${queryFlags} ${term} + ${term2}`,
+      `${this.flags.bzl_binary} query ${Workspace.QUERY_FLAGS} ${term} + ${term2}`,
       { cwd: this.getFlags().base_dir, silent: !this.flags.debug }
     );
 

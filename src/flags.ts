@@ -11,7 +11,8 @@ export enum GeneratorType {
   NG = 'ng',
   NG_BUNDLE = 'ng_bundle',
   SASS = 'sass',
-  TS = 'ts'
+  TS = 'ts',
+  JS_BINARY = 'js_binary'
 }
 
 function coerceMappingFlag(loads: string[]): Map<string, string> {
