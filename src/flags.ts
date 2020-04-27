@@ -165,11 +165,6 @@ interface CommonFlags {
    * Path or name of the buildifier binary
    */
   buildifier_binary: string;
-
-  /**
-   * Path or name of the buildozer binary
-   */
-  buildozer_binary: string;
 }
 
 type AllFlags = CommonFlags & SassGeneratorFlags & TsGeneratorFlags & NgGeneratorFlags;
@@ -325,19 +320,6 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       group: 'Configuration',
       choices: ['BUILD', 'BUILD.bazel']
     })
-    .option('buildozer_commands_file', {
-      type: 'string',
-      description: 'Path to write the buildozer command file',
-      default: 'commands.txt',
-      requiresArg: true,
-      group: 'Configuration'
-    })
-    .option('clean_commands_file', {
-      type: 'boolean',
-      description: 'If set, then the buildozer commands file is removed when done',
-      default: true,
-      group: 'Configuration'
-    })
     .option('default_visibility', {
       type: 'string',
       description: 'The default visibility to set on rules',
@@ -403,13 +385,6 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       type: 'string',
       description: 'The name (or path) to use for the buildifier binary',
       default: 'buildifier',
-      requiresArg: true,
-      group: 'Finalization'
-    })
-    .option('buildozer_binary', {
-      type: 'string',
-      description: 'The name (or path) to use for the buildozer binary',
-      default: 'buildozer',
       requiresArg: true,
       group: 'Finalization'
     })

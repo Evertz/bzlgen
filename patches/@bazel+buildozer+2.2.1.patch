@@ -1,0 +1,38 @@
+diff --git a/node_modules/@bazel/buildozer/index.d.ts b/node_modules/@bazel/buildozer/index.d.ts
+index dfe7d2f..d85c57d 100755
+--- a/node_modules/@bazel/buildozer/index.d.ts
++++ b/node_modules/@bazel/buildozer/index.d.ts
+@@ -23,4 +23,4 @@ export interface CommandBatch {
+ export declare function run(...commands: CommandBatch[]): string[];
+ export declare function runWithOptions(commands: CommandBatch[], options: {
+     cwd?: string;
+-}): string[];
++}, flags?: string[]): string[];
+diff --git a/node_modules/@bazel/buildozer/index.js b/node_modules/@bazel/buildozer/index.js
+index 6b282d6..f635cda 100755
+--- a/node_modules/@bazel/buildozer/index.js
++++ b/node_modules/@bazel/buildozer/index.js
+@@ -17,18 +17,19 @@ function run(...commands) {
+     return runWithOptions(commands, {});
+ }
+ exports.run = run;
+-function runWithOptions(commands, options) {
++function runWithOptions(commands, options, flags) {
+     // From https://github.com/bazelbuild/buildtools/tree/master/buildozer#usage:
+     // Here, label-list is a comma-separated list of Bazel labels,
+     // for example //path/to/pkg1:rule1, //path/to/pkg2:rule2.
+     // Buildozer reads commands from FILE (- for stdin 
+     //   (format: |-separated command line arguments to buildozer, excluding flags))
+     const input = commands.map(c => [...c.commands, c.targets.join(',')].join('|')).join('\n');
+-    const { stdout, stderr, status, error } = child_process_1.spawnSync(getNativeBinary(), [
++    const _flags = flags ? flags : [];
++    const { stdout, stderr, status, error } = child_process_1.spawnSync(getNativeBinary(), _flags.concat([
+         '-f', '-' /* read commands from stdin */
+-    ], Object.assign(Object.assign({}, options), { input, encoding: 'utf-8' }));
++    ]), Object.assign(Object.assign({}, options), { input, encoding: 'utf-8' }));
+     // https://github.com/bazelbuild/buildtools/tree/master/buildozer#error-code
+-    if (status == 0 || status == 3)
++    if (status == 0 || status == 2 || status == 3)
+         return stdout.trim().split('\n').filter(l => !!l);
+     console.error(`buildozer exited with status ${status}\n${stderr}`);
+     throw error;

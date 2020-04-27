@@ -64,13 +64,14 @@ import { SomeComponent } from './component.component';
     const expected =
       'new_load @npm_angular_bazel//:index.bzl ng_module|//src/component:__pkg__\n' +
       'new ng_module component|//src/component:__pkg__\n' +
+      'new_load @io_bazel_rules_sass//sass:sass.bzl sass_binary|//src/component:__pkg__\n' +
+      'new sass_binary component-component-styles|//src/component:__pkg__\n' +
+      'new_load @io_bazel_rules_sass//sass:sass.bzl sass_binary|//src/component:__pkg__\n' +
+      'new sass_binary component-theme-theme|//src/component:__pkg__\n' +
       'add srcs component.component.ts component.module.ts|//src/component:component\n' +
       'add deps @npm//@angular/core:core @npm//rxjs:rxjs|//src/component:component\n' +
       'add assets component.component.html //src/component:component-component-styles|//src/component:component\n' +
-      'new_load @io_bazel_rules_sass//sass:sass.bzl sass_binary|//src/component:__pkg__\n' +
-      'new sass_binary component-component-styles|//src/component:__pkg__\n' +
       'set src "component.component.scss"|//src/component:component-component-styles\n' +
-      'new sass_binary component-theme-theme|//src/component:__pkg__\n' +
       'set src "component.theme.scss"|//src/component:component-theme-theme';
 
     expect(commands.join('\n')).toEqual(expected);
@@ -85,7 +86,6 @@ import { SomeComponent } from './component.component';
     gen.generate();
 
     const commands = workspace.getBuildozer().toCommands();
-
     const expected =
       'new_load //tools/rules_bazel/defs.bzl ng_module|//src/component:__pkg__\n' +
       'new ng_module component|//src/component:__pkg__\n' +
