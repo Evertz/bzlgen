@@ -5,7 +5,7 @@ import { TsGenerator } from '../../src/generators/ts/ts.generator';
 import { Workspace } from '../../src/workspace';
 import { TsGeneratorFlags } from '../../src/generators/ts/ts.generator.flags';
 
-describe('ng generator', () => {
+describe('ts generator', () => {
   const TS_ONE =
     `import { component } from '@angular/core';
 import { Foo } from '../other/foo';
@@ -116,6 +116,26 @@ export class Some {}
 new ts_library some|//src/some:__pkg__
 add srcs one.ts|//src/some:some
 add deps @npm//package:package @npm//@scope/package:package|//src/some:some
+set tsconfig "//:tsconfig"|//src/some:some`;
+
+    expect(commands.join('\n')).toEqual(expected);
+  });
+
+  it('converts builtin imports for node types', async () => {
+    mockfs({
+      '/home/workspace/src/some': {
+        'one.ts': `import * as fs from 'fs';`
+      },
+    },);
+
+    await gen.generate();
+
+    const commands = workspace.getBuildozer().toCommands();
+
+    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+new ts_library some|//src/some:__pkg__
+add srcs one.ts|//src/some:some
+add deps @npm//@types/node:node|//src/some:some
 set tsconfig "//:tsconfig"|//src/some:some`;
 
     expect(commands.join('\n')).toEqual(expected);

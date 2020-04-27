@@ -12,6 +12,7 @@ RUNTIME_NPM_DEPS = [
     "@npm//typescript",
     "@npm//minimatch",
     "@npm//tsconfig-paths",
+    "@npm//builtins",
 ]
 
 ts_library(
