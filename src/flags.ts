@@ -12,7 +12,8 @@ export enum GeneratorType {
   NG_BUNDLE = 'ng_bundle',
   SASS = 'sass',
   TS = 'ts',
-  JS_BINARY = 'js_binary'
+  JS_BINARY = 'js_binary',
+  CONTAINER_LAYER = 'container_layer'
 }
 
 function coerceMappingFlag(loads: string[]): Map<string, string> {
@@ -39,6 +40,11 @@ interface CommonFlags {
    * Relative path to the directory or file to generate for
    */
   path: string;
+
+  /**
+   * A glob pattern that is applied to the files at path when path represents a directory
+   */
+  pattern: string;
 
   /**
    * Remove the existing build file before creating the new one
@@ -259,6 +265,12 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
     .option('nuke_build_file', {
       type: 'boolean',
       description: 'Remove the existing build file before creating the new one',
+      default: false,
+      group: 'Configuration'
+    })
+    .option('pattern', {
+      type: 'string',
+      description: 'A glob pattern that is applied to the files at path when path represents a directory',
       default: false,
       group: 'Configuration'
     })

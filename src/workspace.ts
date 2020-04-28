@@ -10,6 +10,7 @@ import { Buildozer } from './buildozer';
 import { Flags } from './flags';
 import { Label } from './label';
 import { debug, fatal, isDebugEnabled, lb, log, warn } from './logger';
+import { match } from 'minimatch';
 
 export class Workspace {
   private static readonly QUERY_FLAGS = `--output label --order_output=no`;
@@ -68,8 +69,15 @@ export class Workspace {
   readDirectory(): string[] {
     if (!this.isDirectory()) { return []; }
 
-    return readdirSync(this.getAbsolutePath())
-      .map(file => this.resolveRelativeToWorkspace(file));
+    const files = readdirSync(this.getAbsolutePath())
+      .map(file => this.resolveRelativeToWorkspace(file))
+      .filter(file => !file.endsWith(this.flags.build_file_name));
+
+    if (this.flags.pattern) {
+      return match(files, join(this.flags.path, this.flags.pattern));
+    }
+
+    return files;
   }
 
   /**

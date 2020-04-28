@@ -9,6 +9,7 @@ import { TsGenerator } from './generators/ts/ts.generator';
 import { debug, fatal, lb, log, warn } from './logger';
 import { snapshot, wrap, TRACER_PATH } from './tracing';
 import { Workspace } from './workspace';
+import { ContainerLayerGenerator } from './generators/containers/container-layer.generator';
 
 function printFlags(flags: Flags) {
   log('Canonicalized Flags:');
@@ -35,6 +36,8 @@ function getGenerator(type: GeneratorType, workspace: Workspace): BuildFileGener
       return new NgGenerator(workspace);
     case GeneratorType.JS_BINARY:
       return new NodejsBinaryGenerator(workspace);
+    case GeneratorType.CONTAINER_LAYER:
+      return new ContainerLayerGenerator(workspace);
     default:
       fatal(`No generator found for type ${type}`);
   }

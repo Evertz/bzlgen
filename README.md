@@ -10,6 +10,7 @@ The generator can create rules for the following and can be extended to provide 
 * ng_module
 * ts_library
 * nodejs_binary
+* container_layer
 
 The generator is _somewhat_ flexible in the source structure, but does make a number of assumptions in certain cases.
 It will try and 'best guess' labels from other packages. It's currently not expected to generate a 100% correct and working build file,

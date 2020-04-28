@@ -7,6 +7,7 @@ const DEFAULT_LOAD_SITES = new Map<string, string>([
   ['ts_library', '@npm_bazel_typescript//:index.bzl'],
   ['ng_module', '@npm_angular_bazel//:index.bzl'],
   ['nodejs_binary', '@build_bazel_rules_nodejs//:index.bzl'],
+  ['container_layer', '@io_bazel_rules_docker//container:container.bzl'],
 ]);
 
 /**
@@ -203,11 +204,11 @@ export class Buildozer {
     this.addCommand(`new_load ${from} ${symbols}`, label.withTarget(Buildozer.PKG));
   }
 
-  addAttr(attr: string, value: string[], label: Label) {
+  addAttr(attr: string, value: Array<string | Label>, label: Label) {
     this.addCommand(`add ${attr} ${value.join(' ')}`, label);
   }
 
-  setAttr(attr: string, value: string, label: Label) {
+  setAttr(attr: string, value: string | Label, label: Label) {
     this.addCommand(`set ${attr} "${value}"`, label);
   }
 
