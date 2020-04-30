@@ -24,7 +24,7 @@ function coerceMappingFlag(loads: string[]): Map<string, string> {
 
 const RC_FILE_NAME = '.bzlgenrc';
 
-interface CommonFlags {
+export interface CommonFlags {
   /*
    * Common Flags
    * Affects all rule generation
@@ -94,6 +94,14 @@ interface CommonFlags {
    * The name to use for bazel build files, eg BUILD or BUILD.bazel
    */
   build_file_name: string;
+
+  /**
+   * When generating best guess dependency labels, treat the dependency labels as though there is a BUILD file for each
+   * directory and use the package default label - //my/package:package
+   * If false, then the filename is considered to be the target for the dependency label - //my/package:main
+   * Defaults true
+   */
+  pkg_default_dep_labels: boolean;
 
   /**
    * Path to write the buildozer command file
@@ -348,6 +356,11 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       type: 'boolean',
       description: 'Use bazel query to try and resolve labels for source files',
       default: false
+    })
+    .option('pkg_default_dep_labels', {
+      type: 'boolean',
+      description: 'When generating best guess dependency labels, treat the dependency labels as though there is a BUILD file for each directory',
+      default: true
     })
     // verbosity flags
     .option('canonicalize_flags', {

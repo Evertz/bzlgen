@@ -1,6 +1,6 @@
 import * as mockfs from 'mock-fs';
 
-import { setupAndParseArgs } from '../../src/flags';
+import { CommonFlags, setupAndParseArgs } from '../../src/flags';
 import { TsGenerator } from '../../src/generators/ts/ts.generator';
 import { Workspace } from '../../src/workspace';
 import { TsGeneratorFlags } from '../../src/generators/ts/ts.generator.flags';
@@ -95,7 +95,7 @@ export class Some {}
       'new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__\n' +
       'new ts_library some|//src/some:__pkg__\n' +
       'add srcs one.ts|//src/some:some\n' +
-      'add deps //src/some/nested:main|//src/some:some\n' +
+      'add deps //src/some/nested:nested|//src/some:some\n' +
       'set tsconfig "//:tsconfig"|//src/some:some';
 
     expect(commands.join('\n')).toEqual(expected);
@@ -136,6 +136,54 @@ set tsconfig "//:tsconfig"|//src/some:some`;
 new ts_library some|//src/some:__pkg__
 add srcs one.ts|//src/some:some
 add deps @npm//@types/node:node|//src/some:some
+set tsconfig "//:tsconfig"|//src/some:some`;
+
+    expect(commands.join('\n')).toEqual(expected);
+  });
+
+  it('can set default package label as dep', async () => {
+    mockfs({
+      '/home/workspace/src/some': {
+        'one.ts': `import {SOME_CONST} from './nested/two'; `
+      },
+      '/home/workspace/src/some/nested': {
+        'two.ts': `export const SOME_CONST = '';`
+      }
+    });
+
+    await gen.generate();
+
+    const commands = workspace.getBuildozer().toCommands();
+
+    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+new ts_library some|//src/some:__pkg__
+add srcs one.ts|//src/some:some
+add deps //src/some/nested:nested|//src/some:some
+set tsconfig "//:tsconfig"|//src/some:some`;
+
+    expect(commands.join('\n')).toEqual(expected);
+  });
+
+  it('can set file as dep label', async () => {
+    mockfs({
+      '/home/workspace/src/some': {
+        'one.ts': `import {SOME_CONST} from './nested/two'; `
+      },
+      '/home/workspace/src/some/nested': {
+        'two.ts': `export const SOME_CONST = '';`
+      }
+    });
+
+    (workspace.getFlags() as CommonFlags).pkg_default_dep_labels = false;
+
+    await gen.generate();
+
+    const commands = workspace.getBuildozer().toCommands();
+
+    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+new ts_library some|//src/some:__pkg__
+add srcs one.ts|//src/some:some
+add deps //src/some/nested:two|//src/some:some
 set tsconfig "//:tsconfig"|//src/some:some`;
 
     expect(commands.join('\n')).toEqual(expected);

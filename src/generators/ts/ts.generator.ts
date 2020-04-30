@@ -127,7 +127,9 @@ export class TsGenerator extends BuildFileGenerator {
 
     if (relative) {
       label = this.workspace.getLabelForFile(imp + '.ts');
-      if (label) { return label; }
+      if (label) {
+        return this.flags.pkg_default_dep_labels ? label.asDefaultLabel() : label;
+      }
 
       throw new Error (`Unable to generate label for: ${imp}`)
     } else {
