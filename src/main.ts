@@ -1,15 +1,10 @@
 import { inspect } from 'util';
 
-import { setupAndParseArgs, Flags, GeneratorType } from './flags';
-import { BuildFileGenerator } from './generators/generator';
-import { NodejsBinaryGenerator } from './generators/js/nodejs-binary.generator';
-import { NgGenerator } from './generators/ng/ng.generator';
-import { SassGenerator } from './generators/sass/sass.generator';
-import { TsGenerator } from './generators/ts/ts.generator';
+import { setupAndParseArgs, Flags } from './flags';
 import { debug, fatal, lb, log, warn } from './logger';
 import { snapshot, wrap, TRACER_PATH } from './tracing';
 import { Workspace } from './workspace';
-import { ContainerLayerGenerator } from './generators/containers/container-layer.generator';
+import { getGenerator } from './generators/resolve-generator';
 
 function printFlags(flags: Flags) {
   log('Canonicalized Flags:');
@@ -23,24 +18,6 @@ function printFlags(flags: Flags) {
     log(`\t--${flag}=${inspect(flagValue)}`);
   });
   lb();
-}
-
-function getGenerator(type: GeneratorType, workspace: Workspace): BuildFileGenerator {
-  switch (type)  {
-    case GeneratorType.SASS:
-      return new SassGenerator(workspace);
-    case GeneratorType.TS:
-      return new TsGenerator(workspace);
-    case GeneratorType.NG:
-    case GeneratorType.NG_BUNDLE:
-      return new NgGenerator(workspace);
-    case GeneratorType.JS_BINARY:
-      return new NodejsBinaryGenerator(workspace);
-    case GeneratorType.CONTAINER_LAYER:
-      return new ContainerLayerGenerator(workspace);
-    default:
-      fatal(`No generator found for type ${type}`);
-  }
 }
 
 export async function run() {

@@ -2,11 +2,11 @@ import { tsquery } from '@phenomnomnominal/tsquery';
 import { parse } from 'path';
 import { StringLiteral } from 'typescript';
 
-import { GeneratorType } from '../../flags';
 import { fatal } from '../../logger';
 import { Workspace } from '../../workspace';
 import { SassGenerator } from '../sass/sass.generator';
 import { TsGenerator } from '../ts/ts.generator';
+import { GeneratorType } from '../types';
 
 const STYLE_URLS_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="styleUrls"]) ArrayLiteralExpression StringLiteral';
 const TEMPLATE_URL_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="templateUrl"]) StringLiteral';

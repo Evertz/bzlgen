@@ -1,10 +1,10 @@
 import * as gonzales from 'gonzales-pe';
 import { ParsedPath } from 'path';
 
-import { GeneratorType } from '../../flags';
 import { log } from '../../logger';
 import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
+import { GeneratorType } from '../types';
 
 export class SassGenerator extends BuildFileGenerator {
   constructor(workspace: Workspace) {

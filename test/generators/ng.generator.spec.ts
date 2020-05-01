@@ -1,8 +1,9 @@
 import * as mockfs from 'mock-fs';
 
-import { setupAndParseArgs, GeneratorType } from '../../src/flags';
+import { setupAndParseArgs } from '../../src/flags';
 import { NgGenerator } from '../../src/generators/ng/ng.generator';
 import { Workspace } from '../../src/workspace';
+import { GeneratorType } from '../../src/generators/types';
 
 describe('ng generator', () => {
   const NG_COMPONENT =
