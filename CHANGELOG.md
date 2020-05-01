@@ -1,6 +1,11 @@
 ## Changelog
 
-#### 0.0.0-PLACEHOLDER
+#### 0.4.1
+
+* **fix**: Add `--pkg_default_dep_labels` defaulting to `true`. This causes generated dep labels to use the package default label (`//my/package`)
+rather than the file label of the imported dependency (`//my/package:foo`). bzlgen will generate targets with the package name when generating a directory [#20](https://github.com/Evertz/bzlgen/issues/20)
+
+#### 0.4.0
 
 * **feat**: Support generating `nodejs_binary` target. The `data` attr will be set to `entry_points` generating rule [#36](https://github.com/Evertz/bzlgen/pull/36)
 * **feat**: Use the buildozer API via the NodeJS bindings rather than invoking directly in a shell on a text file [#34](https://github.com/Evertz/bzlgen/pull/34)
