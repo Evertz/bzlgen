@@ -6,15 +6,7 @@ import { NgGeneratorFlags } from './generators/ng/ng.generator.flags';
 import { SassGeneratorFlags } from './generators/sass/sass.generator.flags';
 import { TsGeneratorFlags } from './generators/ts/ts.generator.flags';
 import { debug, fatal, lb } from './logger';
-
-export enum GeneratorType {
-  NG = 'ng',
-  NG_BUNDLE = 'ng_bundle',
-  SASS = 'sass',
-  TS = 'ts',
-  JS_BINARY = 'js_binary',
-  CONTAINER_LAYER = 'container_layer'
-}
+import { GeneratorType } from './generators/types';
 
 function coerceMappingFlag(loads: string[]): Map<string, string> {
   const items: Array<[string, string]> = loads

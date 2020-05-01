@@ -13,11 +13,11 @@ import {
 import { createMatchPath, MatchPath } from 'tsconfig-paths';
 import * as Builtins from 'builtins';
 
-import { GeneratorType } from '../../flags';
 import { Label } from '../../label';
 import { log } from '../../logger';
 import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
+import { GeneratorType } from '../types';
 
 const IMPORTS_QUERY = `ImportDeclaration:has(StringLiteral)`;
 const EXPORTS_QUERY = `ExportDeclaration:has(StringLiteral)`;

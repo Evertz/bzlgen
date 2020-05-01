@@ -1,6 +1,7 @@
-import { Flags, GeneratorType } from '../flags';
+import { Flags } from '../flags';
 import { Workspace } from '../workspace';
 import { Buildozer } from '../buildozer';
+import { GeneratorType } from './types';
 
 export abstract class BuildFileGenerator {
   protected readonly flags: Flags;

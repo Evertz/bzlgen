@@ -1,5 +1,5 @@
-import { GeneratorType } from '../../flags';
 import { BuildFileGenerator } from '../generator';
+import { GeneratorType } from '../types';
 
 export class ContainerLayerGenerator extends BuildFileGenerator {
 
