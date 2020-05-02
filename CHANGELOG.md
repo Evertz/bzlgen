@@ -1,5 +1,10 @@
 ## Changelog
 
+#### 0.0.0-PLACEHOLDER
+
+* **fix**: Don't evict unknown rule loads from load mappings
+* **refactor**: Split generator resolution and types into separate files [#40](https://github.com/Evertz/bzlgen/issues/40)
+
 #### 0.4.1
 
 * **fix**: Add `--pkg_default_dep_labels` defaulting to `true`. This causes generated dep labels to use the package default label (`//my/package`)
