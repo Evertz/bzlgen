@@ -1,5 +1,7 @@
-import { parse, posix } from 'path';
 import { tsquery } from '@phenomnomnominal/tsquery';
+import * as Builtins from 'builtins';
+import { parse, posix } from 'path';
+import { createMatchPath, MatchPath } from 'tsconfig-paths';
 import {
   ExportDeclaration,
   Expression,
@@ -10,24 +12,31 @@ import {
   SourceFile,
   sys
 } from 'typescript';
-import { createMatchPath, MatchPath } from 'tsconfig-paths';
-import * as Builtins from 'builtins';
 
+import { Flags } from '../../flags';
 import { Label } from '../../label';
 import { log } from '../../logger';
 import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
+import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
+import { TsGeneratorFlagBuilder, TsGeneratorFlags } from './ts.generator.flags';
 
 const IMPORTS_QUERY = `ImportDeclaration:has(StringLiteral)`;
 const EXPORTS_QUERY = `ExportDeclaration:has(StringLiteral)`;
 
+@Generator({
+  type: GeneratorType.TS,
+  flags: TsGeneratorFlagBuilder
+})
 export class TsGenerator extends BuildFileGenerator {
   protected readonly tsPathsMatcher: MatchPath;
   protected readonly builtins: string[] = [];
+  protected readonly flags: Flags<TsGeneratorFlags>;
 
   constructor(workspace: Workspace) {
     super(workspace);
+    this.flags = this.getFlags<TsGeneratorFlags>();
 
     this.builtins = Builtins();
     this.tsPathsMatcher = this.createPathMatcherForTsPaths();
@@ -35,15 +44,14 @@ export class TsGenerator extends BuildFileGenerator {
 
   async generate(): Promise<void> {
     const files = this.workspace.isDirectory() ? this.workspace.readDirectory() : [this.workspace.getPath()];
-    const flags = this.workspace.getFlags();
 
     const tsFiles = files
       .filter(file => file.endsWith('.ts'))
-      .filter(file => !(flags.ignore_spec_files && file.endsWith('.spec.ts')));
+      .filter(file => !(this.flags.ignore_spec_files && file.endsWith('.spec.ts')));
 
     const deps = new Set<string>();
     tsFiles
-      .forEach(file => this.processFile(file, tsFiles, flags.npm_workspace_name, deps));
+      .forEach(file => this.processFile(file, tsFiles, this.flags.npm_workspace_name, deps));
 
     const label = this.workspace.isDirectory() ? this.workspace.getLabelForPath() :
       this.workspace.getLabelForPath().withTarget(this.workspace.getPathInfo().name);
@@ -52,12 +60,12 @@ export class TsGenerator extends BuildFileGenerator {
       .setSrcs(tsFiles.map(path => parse(path).base))
       .addDeps(Array.from(deps));
 
-    if (flags.ts_config_label) {
-      tsLibrary.setTsconfig(flags.ts_config_label);
+    if (this.flags.ts_config_label) {
+      tsLibrary.setTsconfig(this.flags.ts_config_label);
     }
 
-    if (flags.default_visibility) {
-      tsLibrary.setVisibility(flags.default_visibility);
+    if (this.flags.default_visibility) {
+      tsLibrary.setVisibility(this.flags.default_visibility);
     }
   }
 
@@ -160,11 +168,11 @@ export class TsGenerator extends BuildFileGenerator {
   }
 
   private createPathMatcherForTsPaths(): MatchPath | undefined {
-    if (!this.workspace.getFlags().ts_config) {
+    if (!this.flags.ts_config) {
       return;
     }
 
-    const tsconfigPath = this.workspace.resolveRelativeToWorkspace(this.workspace.getFlags().ts_config);
+    const tsconfigPath = this.workspace.resolveRelativeToWorkspace(this.flags.ts_config);
     const tsConfigSourceFile = readJsonConfigFile(tsconfigPath, path => this.workspace.readFile(path));
 
     if (!tsConfigSourceFile) {
@@ -185,6 +193,6 @@ export class TsGenerator extends BuildFileGenerator {
       return;
     }
 
-    return createMatchPath(this.workspace.getAbsolutePath(), parsed.options.paths);
+    return createMatchPath(this.flags.base_dir, parsed.options.paths);
   }
 }

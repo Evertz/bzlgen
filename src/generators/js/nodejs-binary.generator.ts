@@ -1,11 +1,13 @@
 import { BuildFileGenerator } from '../generator';
+import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
 
+@Generator({ type: GeneratorType.JS_BINARY })
 export class NodejsBinaryGenerator extends BuildFileGenerator {
 
   async generate(): Promise<void> {
     const label = this.workspace.getLabelForPath().withTarget('bin');
-    const path = this.flags.path;
+    const path = this.getFlags().path;
 
     this.buildozer.loadRule('nodejs_binary', label);
     this.buildozer.newRule('nodejs_binary', label);

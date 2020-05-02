@@ -72,13 +72,13 @@ export class Some {}
   it('can use tsconfig paths', async () => {
     mockfs({
       '/home/workspace': {
+        'tsconfig.json': `{"compilerOptions":{"paths":{"@foo/*":["src/some/nested/*"]}}}`,
         src: {
           some: {
             nested: {
               'main.ts': ''
             },
             'one.ts': `import { BAR } from '@foo/main'`,
-            'tsconfig.json': `{"compilerOptions":{"paths":{"@foo/*":["nested/*"]}}}`
           }
         }
       },

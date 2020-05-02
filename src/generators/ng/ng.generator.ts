@@ -1,12 +1,15 @@
 import { tsquery } from '@phenomnomnominal/tsquery';
 import { parse } from 'path';
 import { StringLiteral } from 'typescript';
+import { Flags } from '../../flags';
 
 import { fatal } from '../../logger';
 import { Workspace } from '../../workspace';
+import { Generator } from '../resolve-generator';
 import { SassGenerator } from '../sass/sass.generator';
 import { TsGenerator } from '../ts/ts.generator';
 import { GeneratorType } from '../types';
+import { NgGeneratorFlagBuilder, NgGeneratorFlags } from './ng.generator.flags';
 
 const STYLE_URLS_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="styleUrls"]) ArrayLiteralExpression StringLiteral';
 const TEMPLATE_URL_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="templateUrl"]) StringLiteral';
@@ -17,18 +20,22 @@ type TsFileResultContainer = {
   assets: Set<string>
 };
 
+@Generator({
+  type: [GeneratorType.NG, GeneratorType.NG_BUNDLE],
+  flags: NgGeneratorFlagBuilder
+})
 export class NgGenerator extends TsGenerator {
+
   constructor(readonly workspace: Workspace) {
     super(workspace);
   }
 
   async generate(): Promise<void> {
     const files = this.workspace.readDirectory();
-    const flags = this.workspace.getFlags();
 
     const tsFiles = files
       .filter(file => file.endsWith('.ts'))
-      .filter(file => !(flags.ignore_spec_files && file.endsWith('.spec.ts')));
+      .filter(file => !(this.flags.ignore_spec_files && file.endsWith('.spec.ts')));
 
     const resultContainer: TsFileResultContainer = {
       tsDeps: new Set(),
@@ -37,7 +44,7 @@ export class NgGenerator extends TsGenerator {
     };
 
     tsFiles
-      .forEach((file, i, arr) => this.processTsFile(file, arr, flags.npm_workspace_name, flags.suffix_separator, resultContainer));
+      .forEach((file, i, arr) => this.processTsFile(file, arr, this.flags.npm_workspace_name, this.flags.suffix_separator, resultContainer));
 
     if (this.getGeneratorType() === GeneratorType.NG) {
       this.generateNgModule(files, tsFiles, resultContainer);
@@ -157,7 +164,7 @@ export class NgGenerator extends TsGenerator {
       // TODO(matt): if there are deps on a sass import in the same package we should be able to generate it here
     });
 
-    if (flags.ng_generate_theme_binary) {
+    if (this.getFlags<NgGeneratorFlags>().ng_generate_theme_binary) {
       const themeFiles = allFiles.filter(file => file.endsWith('.theme.scss') && !file.startsWith('_'));
       const themes = this.calculateScssDependencyLabels(themeFiles, new SassGenerator(this.workspace), flags.suffix_separator, 'theme');
 
@@ -171,7 +178,7 @@ export class NgGenerator extends TsGenerator {
 
   private generateNgModuleBundle(allFiles: string[], tsFiles: string[], resultContainer: TsFileResultContainer) {
     const pathLabel = this.workspace.getLabelForPath();
-    const flags = this.workspace.getFlags();
+    const flags = this.getFlags<NgGeneratorFlags>();
 
     this.buildozer.newLoad(flags.ng_module_bundle_load, 'ng_module', pathLabel);
     this.buildozer.newRule('ng_module', pathLabel);

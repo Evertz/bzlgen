@@ -1,14 +1,25 @@
 import * as gonzales from 'gonzales-pe';
 import { ParsedPath } from 'path';
 
+import { Flags } from '../../flags';
 import { log } from '../../logger';
 import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
+import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
+import { SassGeneratorFlagBuilder, SassGeneratorFlags } from './sass.generator.flags';
 
+@Generator({
+  type: GeneratorType.SASS,
+  flags: SassGeneratorFlagBuilder
+})
 export class SassGenerator extends BuildFileGenerator {
+  private readonly flags: Flags<SassGeneratorFlags>;
+
   constructor(workspace: Workspace) {
     super(workspace);
+
+    this.flags = this.getFlags<SassGeneratorFlags>();
   }
 
   async generate(): Promise<void> {
@@ -21,7 +32,7 @@ export class SassGenerator extends BuildFileGenerator {
     const isSassLib = this.isSassLib(scssFileInfo);
 
     const ruleName = this.calculateRuleName(scssFileInfo.base,
-      flags.scss_library_suffix, flags.scss_binary_suffix, isSassLib);
+      this.flags.scss_library_suffix, this.flags.scss_binary_suffix, isSassLib);
 
     const label = this.workspace.getLabelForPath();
 
@@ -82,7 +93,7 @@ export class SassGenerator extends BuildFileGenerator {
         .replace(/"/g, '');
 
       if (resultsAreLabels) {
-        const label = this.calculateDependencyLabel(importPath, flags.scss_library_suffix);
+        const label = this.calculateDependencyLabel(importPath, this.flags.scss_library_suffix);
 
         if (flags.verbose_import_mappings) {
           log(`${importPath}=${label}`);

@@ -1,6 +1,8 @@
 import { BuildFileGenerator } from '../generator';
+import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
 
+@Generator({ type: GeneratorType.CONTAINER_LAYER })
 export class ContainerLayerGenerator extends BuildFileGenerator {
 
   async generate(): Promise<void> {
@@ -16,7 +18,7 @@ export class ContainerLayerGenerator extends BuildFileGenerator {
 
       files.push(...labels);
     } else {
-      files.push(this.workspace.getFileLabel(this.flags.path));
+      files.push(this.workspace.getFileLabel(this.getFlags().path));
     }
 
     this.buildozer.addAttr('files', files, label);

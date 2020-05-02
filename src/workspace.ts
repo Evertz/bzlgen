@@ -10,7 +10,6 @@ import { Buildozer } from './buildozer';
 import { Flags } from './flags';
 import { Label } from './label';
 import { debug, fatal, isDebugEnabled, lb, log, warn } from './logger';
-import { match } from 'minimatch';
 
 export class Workspace {
   private static readonly QUERY_FLAGS = `--output label --order_output=no`;
@@ -24,7 +23,7 @@ export class Workspace {
 
   private listing: Readonly<string[]>;
 
-  constructor(private readonly flags: Flags) {
+  constructor(private readonly flags: Flags<any>) {
     this.buildozer = new Buildozer(this.flags.load_mapping);
 
     const regexLabels: Array<[string, RegExp]> = Array.from(this.flags.label_mapping.entries())
@@ -42,7 +41,7 @@ export class Workspace {
     }
   }
 
-  getFlags(): Flags {
+  getFlags<T>(): Flags<T> {
     return this.flags;
   }
 
@@ -74,7 +73,7 @@ export class Workspace {
       .filter(file => !file.endsWith(this.flags.build_file_name));
 
     if (this.flags.pattern) {
-      return match(files, join(this.flags.path, this.flags.pattern));
+      return minimatch.match(files, join(this.flags.path, this.flags.pattern));
     }
 
     return files;
