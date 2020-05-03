@@ -1,6 +1,7 @@
+import { existsSync } from 'fs';
+import { join, parse, posix } from 'path';
 import { tsquery } from '@phenomnomnominal/tsquery';
 import * as Builtins from 'builtins';
-import { parse, posix } from 'path';
 import { createMatchPath, MatchPath } from 'tsconfig-paths';
 import {
   ExportDeclaration,
@@ -134,7 +135,13 @@ export class TsGenerator extends BuildFileGenerator {
     const relative = this.workspace.isWorkspaceRelative(imp) || imp.startsWith('.');
 
     if (relative) {
-      label = this.workspace.getLabelForFile(imp + '.ts');
+      const index = join(imp, 'index.ts');
+      if (existsSync(this.workspace.resolveAbsolute(index))) {
+        label = this.workspace.getLabelForFile(index);
+      } else {
+        label = this.workspace.getLabelForFile(imp + '.ts');
+      }
+
       if (label) {
         return this.flags.pkg_default_dep_labels ? label.asDefaultLabel() : label;
       }
