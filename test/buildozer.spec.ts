@@ -71,4 +71,12 @@ describe('buildozer', () => {
     const unknown = buildozer.getRuleLoadSite('foo');
     expect(unknown).toBeUndefined();
   });
+
+  it('can add additional loads for rules not part of defaults', () => {
+    const loads = new Map([['ev_pkg_node', '//ev/tooling/bazel:defs.bzl']]);
+    const buildozer = new Buildozer(loads);
+
+    const pkgNode = buildozer.getRuleLoadSite('ev_pkg_node');
+    expect(pkgNode).toEqual('//ev/tooling/bazel:defs.bzl');
+  });
 });

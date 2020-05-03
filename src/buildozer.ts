@@ -212,6 +212,10 @@ export class Buildozer {
     this.addCommand(`set ${attr} "${value}"`, label);
   }
 
+  removeAttr(attr: string, label: Label) {
+    this.addCommand(`remove ${attr}`, label);
+  }
+
   hasRule(name: string): boolean {
     return this.rules.has(name);
   }
@@ -249,7 +253,7 @@ export class Buildozer {
   }
 
   private mergeWithDefaultLoads(source: Map<string, string>): Map<string, string> {
-    const result = new Map<string, string>();
+    const result = new Map<string, string>(source);
     DEFAULT_LOAD_SITES.forEach((value: string, key: string) => {
       if (source.has(key)) {
         result.set(key, source.get(key));
