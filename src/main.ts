@@ -4,9 +4,9 @@ import { setupAndParseArgs, Flags } from './flags';
 import { debug, fatal, lb, log, warn } from './logger';
 import { snapshot, wrap, TRACER_PATH } from './tracing';
 import { Workspace } from './workspace';
-import { getGenerator } from './generators/resolve-generator';
+import { getGenerator } from './generators';
 
-function printFlags(flags: Flags) {
+function printFlags(flags: Flags<any>) {
   log('Canonicalized Flags:');
   log(`type=${inspect(flags.type)}`);
   log(`path=${inspect(flags.path)}`);
@@ -21,7 +21,7 @@ function printFlags(flags: Flags) {
 }
 
 export async function run() {
-  const flags: Flags = setupAndParseArgs(process.argv, process.argv.includes('--no-rc'));
+  const flags = setupAndParseArgs(process.argv, process.argv.includes('--no-rc'));
 
   if (flags.debug) {
     debug(`Writing tracer profile to '${TRACER_PATH}'`);

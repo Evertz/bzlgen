@@ -4,12 +4,14 @@ import { Buildozer } from '../buildozer';
 import { GeneratorType } from './types';
 
 export abstract class BuildFileGenerator {
-  protected readonly flags: Flags;
   protected readonly buildozer: Buildozer;
 
   constructor(protected readonly workspace: Workspace) {
     this.buildozer = workspace.getBuildozer();
-    this.flags = workspace.getFlags();
+  }
+
+  protected getFlags<T>(): Flags<T> {
+    return this.workspace.getFlags<T>();
   }
 
   /**
@@ -29,7 +31,7 @@ export abstract class BuildFileGenerator {
   /**
    * Get the type of generator this is
    */
-  public abstract getGeneratorType(): GeneratorType;
+  public abstract getGeneratorType(): GeneratorType | string;
 
   /**
    * Return if this generator supports directories

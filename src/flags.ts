@@ -2,11 +2,9 @@ import { lstatSync, readFileSync } from 'fs';
 import { isAbsolute, join, resolve } from 'path';
 import * as yargs from 'yargs';
 
-import { NgGeneratorFlags } from './generators/ng/ng.generator.flags';
-import { SassGeneratorFlags } from './generators/sass/sass.generator.flags';
-import { TsGeneratorFlags } from './generators/ts/ts.generator.flags';
 import { debug, fatal, lb } from './logger';
 import { GeneratorType } from './generators/types';
+import { GENERATORS } from './generators/resolve-generator';
 
 function coerceMappingFlag(loads: string[]): Map<string, string> {
   const items: Array<[string, string]> = loads
@@ -174,8 +172,7 @@ export interface CommonFlags {
   buildifier_binary: string;
 }
 
-type AllFlags = CommonFlags & SassGeneratorFlags & TsGeneratorFlags & NgGeneratorFlags;
-export type Flags = Readonly<AllFlags>;
+export type Flags<T> = Readonly<CommonFlags & T>;
 
 const commonYargsOptions = y => {
   return y.positional('path', {
@@ -190,7 +187,7 @@ const commonYargsOptions = y => {
   });
 };
 
-export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): Flags => {
+export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): Flags<any> => {
   const ARGS = [...argv].slice(strip);
   const isDebug = ARGS.includes('--debug');
 
@@ -237,29 +234,9 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
           .positional('type', {
             describe: 'Type of rule to expect to generate',
             type: 'string',
-            choices: Object.entries(GeneratorType).map(t => t[1])
+            choices: Array.from(GENERATORS.values()).map(ref => ref.type)
           });
       }
-    })
-    .command({
-      command: 'sass <path>',
-      builder: y => require('./generators/sass/sass.generator.flags').setupGeneratorCommand(commonYargsOptions(y)),
-      handler: args => args.type = GeneratorType.SASS
-    })
-    .command({
-      command: 'ng <path>',
-      builder: y => require('./generators/ng/ng.generator.flags').setupGeneratorCommand(commonYargsOptions(y)),
-      handler: args => args.type = GeneratorType.NG
-    })
-    .command({
-      command: 'ng_bundle <path>',
-      builder: y => require('./generators/ng/ng.generator.flags').setupGeneratorCommand(commonYargsOptions(y)),
-      handler: args => args.type = GeneratorType.NG_BUNDLE
-    })
-    .command({
-      command: 'ts <path>',
-      builder: y => require('./generators/ts/ts.generator.flags').setupGeneratorCommand(commonYargsOptions(y)),
-      handler: args => args.type = GeneratorType.TS
     })
     // command flags
     .option('nuke_build_file', {
@@ -409,5 +386,19 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
     .wrap(yargs.terminalWidth())
     .version();
 
-  return parser.parse(ARGS) as Flags;
+  GENERATORS.forEach(ref => {
+    parser.command({
+      command: `${ref.type} <path>`,
+      description: ref.description,
+      builder: builder => {
+        commonYargsOptions(builder);
+
+        if (!ref.flags) { return builder; }
+        Object.keys(ref.flags).forEach(flag => builder.option(flag, ref.flags[flag]));
+      },
+      handler: args => args.type = ref.type
+    });
+  });
+
+  return parser.parse(ARGS) as Flags<any>;
 };

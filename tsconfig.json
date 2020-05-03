@@ -3,6 +3,8 @@
         "lib": [
             "es2019"
         ],
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     }
 }
