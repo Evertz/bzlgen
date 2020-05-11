@@ -4,6 +4,7 @@ export * from './js/nodejs-binary.generator';
 export * from './ng/ng.generator';
 export * from './sass/sass.generator';
 export * from './ts/ts.generator';
+export * from './builtin/filegroup.generator';
 
 export { GeneratorType } from './types';
 export { getGenerator }from './resolve-generator';

@@ -4,5 +4,6 @@ export enum GeneratorType {
   SASS = 'sass',
   TS = 'ts',
   JS_BINARY = 'js_binary',
-  CONTAINER_LAYER = 'container_layer'
+  CONTAINER_LAYER = 'container_layer',
+  FILEGROUP = 'filegroup'
 }
