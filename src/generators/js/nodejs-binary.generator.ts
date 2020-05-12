@@ -2,7 +2,10 @@ import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
 
-@Generator({ type: GeneratorType.JS_BINARY })
+@Generator({
+  type: GeneratorType.JS_BINARY,
+  description: 'Generates a nodejs_binary rule setting the entry_point to the file at the given path'
+})
 export class NodejsBinaryGenerator extends BuildFileGenerator {
 
   async generate(): Promise<void> {

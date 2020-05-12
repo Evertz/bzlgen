@@ -18,7 +18,7 @@ export type FlagBuilder = { [flag: string]: FlagOptions };
 export interface Ref<T extends typeof BuildFileGenerator> {
   generator: T;
   type: GeneratorType | string;
-  description?: string;
+  description: string;
   flags?: FlagBuilder;
 }
 
@@ -35,7 +35,7 @@ export function getGenerator(type: GeneratorType, workspace: Workspace): BuildFi
 }
 
 export function Generator(options:
-                            { type: GeneratorType | string | Array<string | GeneratorType>, flags?: FlagBuilder, description?: string }) {
+                            { type: GeneratorType | string | Array<string | GeneratorType>, flags?: FlagBuilder, description: string }) {
   return function (generator) {
     if (Array.isArray(options.type)) {
       options.type.forEach(type => {
