@@ -319,17 +319,14 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
     .option('ignore_spec_files', {
       type: 'boolean',
       description: 'Ignores spec files from import resolution and generation',
-      default: true
-    })
-    .option('use_bazel_query', {
-      type: 'boolean',
-      description: 'Use bazel query to try and resolve labels for source files',
-      default: false
+      default: true,
+      group: 'Configuration'
     })
     .option('pkg_default_dep_labels', {
       type: 'boolean',
       description: 'When generating best guess dependency labels, treat the dependency labels as though there is a BUILD file for each directory',
-      default: true
+      default: true,
+      group: 'Configuration'
     })
     // verbosity flags
     .option('canonicalize_flags', {
@@ -382,6 +379,12 @@ export const setupAndParseArgs = (argv: string[], ignorerc = false, strip = 2): 
       default: 'buildifier',
       requiresArg: true,
       group: 'Finalization'
+    })
+    .option('use_bazel_query', {
+      type: 'boolean',
+      description: 'Use bazel query to try and resolve labels for source files',
+      default: false,
+      group: 'Experimental'
     })
     .wrap(yargs.terminalWidth())
     .version();

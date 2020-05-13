@@ -2,7 +2,10 @@ import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
 
-@Generator({ type: GeneratorType.CONTAINER_LAYER })
+@Generator({
+  type: GeneratorType.CONTAINER_LAYER,
+  description: 'Generates a container_layer rule containing all the files captured by the path parameter'
+})
 export class ContainerLayerGenerator extends BuildFileGenerator {
 
   async generate(): Promise<void> {
@@ -22,6 +25,8 @@ export class ContainerLayerGenerator extends BuildFileGenerator {
     }
 
     this.buildozer.addAttr('files', files, label);
+
+    this.setDefaultVisibilityOn(label);
   }
 
   getGeneratorType(): GeneratorType {

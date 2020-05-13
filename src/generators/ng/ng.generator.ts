@@ -1,7 +1,6 @@
 import { tsquery } from '@phenomnomnominal/tsquery';
 import { parse } from 'path';
 import { StringLiteral } from 'typescript';
-import { Flags } from '../../flags';
 
 import { fatal } from '../../logger';
 import { Workspace } from '../../workspace';
@@ -21,8 +20,14 @@ type TsFileResultContainer = {
 };
 
 @Generator({
-  type: [GeneratorType.NG, GeneratorType.NG_BUNDLE],
-  flags: NgGeneratorFlagBuilder
+  type: GeneratorType.NG,
+  flags: NgGeneratorFlagBuilder,
+  description: 'Generates a ng_module rule for an Angular component'
+})
+@Generator({
+  type: GeneratorType.NG_BUNDLE,
+  flags: NgGeneratorFlagBuilder,
+  description: 'Generates a ng_module macro rule for an Angular component'
 })
 export class NgGenerator extends TsGenerator {
 

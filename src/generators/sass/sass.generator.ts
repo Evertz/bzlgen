@@ -11,7 +11,8 @@ import { SassGeneratorFlagBuilder, SassGeneratorFlags } from './sass.generator.f
 
 @Generator({
   type: GeneratorType.SASS,
-  flags: SassGeneratorFlagBuilder
+  flags: SassGeneratorFlagBuilder,
+  description: 'Generates a sass_binary or sass_library depending on the input path type'
 })
 export class SassGenerator extends BuildFileGenerator {
   private readonly flags: Flags<SassGeneratorFlags>;

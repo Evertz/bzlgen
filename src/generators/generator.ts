@@ -2,16 +2,13 @@ import { Flags } from '../flags';
 import { Workspace } from '../workspace';
 import { Buildozer } from '../buildozer';
 import { GeneratorType } from './types';
+import { Label } from '../label';
 
 export abstract class BuildFileGenerator {
   protected readonly buildozer: Buildozer;
 
   constructor(protected readonly workspace: Workspace) {
     this.buildozer = workspace.getBuildozer();
-  }
-
-  protected getFlags<T>(): Flags<T> {
-    return this.workspace.getFlags<T>();
   }
 
   /**
@@ -37,4 +34,21 @@ export abstract class BuildFileGenerator {
    * Return if this generator supports directories
    */
   public abstract supportsDirectories(): boolean;
+
+  /**
+   * Returns the set of flags associated with this run
+   */
+  protected getFlags<T>(): Flags<T> {
+    return this.workspace.getFlags<T>();
+  }
+
+  /**
+   * Sets the visibility of the rule at 'label' to the visibility set at the --default_visibility flag
+   * @param label
+   */
+  protected setDefaultVisibilityOn(label: Label) {
+    if (this.getFlags().default_visibility) {
+      this.buildozer.setVisibility([this.getFlags().default_visibility], label);
+    }
+  }
 }

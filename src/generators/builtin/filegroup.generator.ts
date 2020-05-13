@@ -24,9 +24,7 @@ export class FilegroupGenerator extends BuildFileGenerator {
 
     this.buildozer.addAttr('srcs', files, label);
 
-    if (this.getFlags().default_visibility) {
-      this.buildozer.setVisibility([this.getFlags().default_visibility], label);
-    }
+    this.setDefaultVisibilityOn(label);
   }
 
   getGeneratorType(): GeneratorType | string {

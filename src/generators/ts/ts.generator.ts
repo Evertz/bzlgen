@@ -28,7 +28,8 @@ const EXPORTS_QUERY = `ExportDeclaration:has(StringLiteral)`;
 
 @Generator({
   type: GeneratorType.TS,
-  flags: TsGeneratorFlagBuilder
+  flags: TsGeneratorFlagBuilder,
+  description: 'Generates a ts_library for the files or file at path'
 })
 export class TsGenerator extends BuildFileGenerator {
   protected readonly tsPathsMatcher: MatchPath;
