@@ -1,6 +1,6 @@
 # Bazel BUILD file generator
 
-Tool to generate [Bazel](https://bazel.build) for a number of different rule sets and languages. Generation is done via [buildozer](https://github.com/bazelbuild/buildtools/tree/master/buildozer) commands for a given rule and source file or directory.
+Tool to generate [Bazel](https://bazel.build) build files for a number of different rule sets and languages. Generation is done via [buildozer](https://github.com/bazelbuild/buildtools/tree/master/buildozer) commands for a given rule and source file or directory.
 
 The generator can create rules for the following and can be extended to provide more
 
