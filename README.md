@@ -1,7 +1,6 @@
-# Buildozer Commands Generator
+# Bazel BUILD file generator
 
-Tool to generate [buildozer](https://github.com/bazelbuild/buildtools/tree/master/buildozer) commands for
-a given rule and source file or directory.
+Tool to generate [Bazel](https://bazel.build) build files for a number of different rule sets and languages. Generation is done via [buildozer](https://github.com/bazelbuild/buildtools/tree/master/buildozer) commands for a given rule and source file or directory.
 
 The generator can create rules for the following and can be extended to provide more
 
@@ -84,7 +83,3 @@ Each line should contain one flag, all lines are processed, except those startin
 # label mappings
 --label_mapping=rxjs/operators=@npm//rxjs
 ```
-
-### ng_bundle
-This repo also contains a `ng_module` macro that this generator can generate for by passing the type `ng_bundle`. The macro encapsulates common
-rules used together when building Angular modules, such as a `sass_binary` for a style or theme file. The macro can be found in `index.bzl`
