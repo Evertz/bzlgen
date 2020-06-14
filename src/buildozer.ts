@@ -8,6 +8,7 @@ const DEFAULT_LOAD_SITES = new Map<string, string>([
   ['ng_module', '@npm_angular_bazel//:index.bzl'],
   ['nodejs_binary', '@build_bazel_rules_nodejs//:index.bzl'],
   ['container_layer', '@io_bazel_rules_docker//container:container.bzl'],
+  ['bzl_library', '@bazel_skylib//:bzl_library.bzl'],
 ]);
 
 /**
