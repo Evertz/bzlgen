@@ -1,0 +1,53 @@
+<idea-plugin>
+  <id>com.evertz.devtools.bzlgen.ij</id>
+  <name>Bzlgen</name>
+  <version>0.1.0</version>
+  <vendor email="opensource@evertz.com" url="https://www.evertz.com">Evertz Microsystems</vendor>
+
+  <description><![CDATA[
+    Bazel build file generator for various rules, driven by bzlgen
+    ]]></description>
+
+  <change-notes><![CDATA[
+      Initial release
+    ]]>
+  </change-notes>
+
+  <idea-version since-build="173.0"/>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij"></extensions>
+
+  <actions>
+    <group id="Bglgen.Generate"
+           text="Bzlgen"
+           description="Bzlgen BUILD file generation"
+           popup="true"
+           compact="true">
+
+      <action id="Bglgen.Generate.container_layer"
+              class="com.evertz.devtools.bzlgen.ij.actions.GenerateContainerLayerRuleAction">
+      </action>
+
+      <action id="Bglgen.Generate.filegroup"
+              class="com.evertz.devtools.bzlgen.ij.actions.GenerateFilegroupRuleAction">
+      </action>
+
+      <action id="Bglgen.Generate.ng_module"
+              class="com.evertz.devtools.bzlgen.ij.actions.GenerateNgModuleRuleAction">
+      </action>
+
+      <action id="Bglgen.Generate.nodejs_binary"
+              class="com.evertz.devtools.bzlgen.ij.actions.GenerateNodeJsBinaryRuleAction">
+      </action>
+
+      <action id="Bglgen.Generate.ts_library"
+              class="com.evertz.devtools.bzlgen.ij.actions.GenerateTsLibraryRuleAction">
+      </action>
+
+      <add-to-group group-id="ProjectViewPopupMenu" />
+    </group>
+  </actions>
+
+</idea-plugin>
