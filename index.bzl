@@ -1,4 +1,4 @@
-load("@npm_angular_bazel//:index.bzl", _ng_module = "ng_module")
+load("@npm//angular/bazel:index.bzl", _ng_module = "ng_module")
 load("@io_bazel_rules_sass//sass:sass.bzl", _sass_binary = "sass_binary", _sass_library = "sass_library")
 
 def ng_module(

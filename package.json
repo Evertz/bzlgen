@@ -3,7 +3,7 @@
   "version": "0.0.0-PLACEHOLDER",
   "author": {
     "email": "opensource@evertz.com",
-    "name": ",Evertz Devtools R&D",
+    "name": "Evertz Devtools R&D",
     "url": "https://evertz.com"
   },
   "keywords": [
@@ -13,10 +13,6 @@
     "build"
   ],
   "description": "Bazel Buildozer command file generator written in Typescript",
-  "scripts": {
-    "postinstall": "patch-package",
-    "patch": "patch-package"
-  },
   "repository": {
     "type": "GIT",
     "url": "https://github.com/Evertz/bzlgen"
@@ -29,29 +25,29 @@
     "bzlgen": "src/bzlgen.js"
   },
   "dependencies": {
-    "@bazel/buildozer": "2.2.1",
-    "@phenomnomnominal/tsquery": "3.0.0",
+    "@bazel/buildozer": "3.4.0",
+    "@phenomnomnominal/tsquery": "4.1.0",
     "builtins": "3.0.1",
-    "gonzales-pe": "4.2.4",
+    "gonzales-pe": "4.3.0",
     "lodash.kebabcase": "4.1.1",
     "minimatch": "3.0.4",
     "patch-package": "6.2.2",
-    "shelljs": "0.8.3",
+    "shelljs": "0.8.4",
     "signale": "1.4.0",
     "tsconfig-paths": "3.9.0",
     "typescript": "3.8.3",
-    "yargs": "14.2.0"
+    "yargs": "15.4.1"
   },
   "devDependencies": {
-    "@bazel/hide-bazel-files": "1.6.0",
-    "@bazel/jasmine": "1.6.0",
-    "@bazel/typescript": "1.6.0",
-    "@types/jasmine": "3.5.0",
+    "@bazel/jasmine": "2.0.2",
+    "@bazel/typescript": "2.0.2",
+    "@types/jasmine": "3.5.12",
     "@types/minimatch": "3.0.3",
     "@types/mock-fs": "4.10.0",
-    "@types/node": "12.7.8",
-    "@types/shelljs": "0.8.6",
-    "mock-fs": "4.10.4"
+    "@types/node": "14.0.27",
+    "@types/shelljs": "0.8.8",
+    "jasmine": "3.6.1",
+    "mock-fs": "4.12.0"
   },
   "license": "MIT"
 }
