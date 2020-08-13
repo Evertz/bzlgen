@@ -5,6 +5,8 @@
 * **fix**: Don't evict unknown rule loads from load mappings
 * **refactor**: Split generator resolution and types into separate files [#40](https://github.com/Evertz/bzlgen/issues/40)
 * **feat**: Support generating `bzl_library` rules
+* **chore**: Updated npm dependencies
+* **chore**: Updated bazel dependencies
 
 #### 0.4.1
 

@@ -1,4 +1,4 @@
-load("@npm_bazel_typescript//:index.bzl", "ts_config")
+load("@npm//@bazel/typescript:index.bzl", "ts_config")
 load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm")
 
 exports_files(
@@ -30,7 +30,6 @@ pkg_npm(
         "README.md",
         "LICENSE",
         "index.bzl",
-        "//patches:@bazel+buildozer+2.2.1.patch",
     ],
     deps = [
          "//src",
