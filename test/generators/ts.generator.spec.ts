@@ -29,7 +29,7 @@ export class Some {}
       './src/some',
       '--base_dir=/home/workspace',
       '--no-assert_is_bazel_workspace',
-      '--load_mapping=ts_library=@npm_bazel_typescript//:index.bzl',
+      '--load_mapping=ts_library=@npm//bazel/typescript:index.bzl',
       '--label_mapping=rxjs/operators=@npm//rxjs',
       '--label_mapping=src/other/foo.ts=//mapped/label',
       '--ts_config_label=//:tsconfig'
@@ -60,7 +60,7 @@ export class Some {}
     const commands = workspace.getBuildozer().toCommands();
 
     const expected =
-      'new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__\n' +
+      'new_load @npm//bazel/typescript:index.bzl ts_library|//src/some:__pkg__\n' +
       'new ts_library some|//src/some:__pkg__\n' +
       'add srcs one.ts two.ts|//src/some:some\n' +
       'add deps @npm//@angular/core:core //mapped/label:label @npm//rxjs:rxjs|//src/some:some\n' +
@@ -92,7 +92,7 @@ export class Some {}
     const commands = workspace.getBuildozer().toCommands();
 
     const expected =
-      'new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__\n' +
+      'new_load @npm//bazel/typescript:index.bzl ts_library|//src/some:__pkg__\n' +
       'new ts_library some|//src/some:__pkg__\n' +
       'add srcs one.ts|//src/some:some\n' +
       'add deps //src/some/nested:nested|//src/some:some\n' +
@@ -112,7 +112,7 @@ export class Some {}
 
     const commands = workspace.getBuildozer().toCommands();
 
-    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+    const expected =`new_load @npm//bazel/typescript:index.bzl ts_library|//src/some:__pkg__
 new ts_library some|//src/some:__pkg__
 add srcs one.ts|//src/some:some
 add deps @npm//package:package @npm//@scope/package:package|//src/some:some
@@ -132,7 +132,7 @@ set tsconfig "//:tsconfig"|//src/some:some`;
 
     const commands = workspace.getBuildozer().toCommands();
 
-    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+    const expected =`new_load @npm//bazel/typescript:index.bzl ts_library|//src/some:__pkg__
 new ts_library some|//src/some:__pkg__
 add srcs one.ts|//src/some:some
 add deps @npm//@types/node:node|//src/some:some
@@ -155,7 +155,7 @@ set tsconfig "//:tsconfig"|//src/some:some`;
 
     const commands = workspace.getBuildozer().toCommands();
 
-    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+    const expected =`new_load @npm//bazel/typescript:index.bzl ts_library|//src/some:__pkg__
 new ts_library some|//src/some:__pkg__
 add srcs one.ts|//src/some:some
 add deps //src/some/nested:nested|//src/some:some
@@ -180,7 +180,7 @@ set tsconfig "//:tsconfig"|//src/some:some`;
 
     const commands = workspace.getBuildozer().toCommands();
 
-    const expected =`new_load @npm_bazel_typescript//:index.bzl ts_library|//src/some:__pkg__
+    const expected =`new_load @npm//bazel/typescript:index.bzl ts_library|//src/some:__pkg__
 new ts_library some|//src/some:__pkg__
 add srcs one.ts|//src/some:some
 add deps //src/some/nested:two|//src/some:some
