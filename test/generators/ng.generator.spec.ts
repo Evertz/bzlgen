@@ -91,7 +91,6 @@ import { SomeComponent } from './component.component';
       'new_load //tools/rules_bazel/defs.bzl ng_module|//src/component:__pkg__\n' +
       'new ng_module component|//src/component:__pkg__\n' +
       'add srcs component.component.ts component.module.ts|//src/component:component\n' +
-      'add deps @npm//@angular/core:core @npm//rxjs:rxjs|//src/component:component\n' +
       'set style "component.component.scss"|//src/component:component\n' +
       'add assets component.component.html|//src/component:component\n' +
       'set theme "component.theme.scss"|//src/component:component';
