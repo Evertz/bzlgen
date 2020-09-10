@@ -2,6 +2,8 @@
 
 #### 0.0.0-PLACEHOLDER
 
+* **fix**: Remove @angular/core, @angular/common and rxjs dependencies when generating with the ng_bundle generator as these deps are already included by default
+
 #### 0.5.0
 
 * **fix**: Don't evict unknown rule loads from load mappings

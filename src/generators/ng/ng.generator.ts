@@ -188,7 +188,13 @@ export class NgGenerator extends TsGenerator {
     this.buildozer.newLoad(flags.ng_module_bundle_load, 'ng_module', pathLabel);
     this.buildozer.newRule('ng_module', pathLabel);
     this.buildozer.addAttr('srcs', tsFiles.map(file => file.split('/').pop()), pathLabel);
-    this.buildozer.addAttr('deps', Array.from(resultContainer.tsDeps), pathLabel);
+
+    const deps = Array.from(resultContainer.tsDeps)
+      .filter(dep => !(dep.endsWith('@angular/core:core') || dep.endsWith('@angular/common:common') || dep.endsWith('rxjs:rxjs')));
+
+    if (deps.length) {
+      this.buildozer.addAttr('deps', deps, pathLabel);
+    }
 
     if (resultContainer.styles.size) {
       // ng_module macro only supports one style
