@@ -101,8 +101,7 @@ export class TsGenerator extends BuildFileGenerator {
   }
 
   private resolveLabelFromModuleSpecifier(moduleSpecifier: Expression, tsFiles: string[] = [], npmWorkspace: string): Label | undefined {
-    const moduleSpecifierText = moduleSpecifier.getText().split(`'`)[1];
-
+    const moduleSpecifierText = moduleSpecifier.getText().replace(/['"]+/g, '');
     const workspaceRelativeImport = this.workspace.resolveRelativeToWorkspace(moduleSpecifierText);
     if (
       tsFiles.includes(

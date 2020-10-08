@@ -69,6 +69,33 @@ export class Some {}
     expect(commands.join('\n')).toEqual(expected);
   });
 
+  it('can handle imports with double and single quotes', async () => {
+    mockfs({
+      '/home/workspace/src/some': {
+        'one.ts': 'import { NgModule } from "@angular/core";\nimport * as r from \'rxjs/operators\'',
+        'component.component.scss': '',
+        'component.component.html': '',
+        'component.theme.scss': ''
+      },
+      '/home/workspace/src/other': {
+        'foo.ts': '',
+      }
+    });
+
+    await gen.generate();
+
+    const commands = workspace.getBuildozer().toCommands();
+
+    const expected =
+      'new_load @npm//bazel/typescript:index.bzl ts_library|//src/some:__pkg__\n' +
+      'new ts_library some|//src/some:__pkg__\n' +
+      'add srcs one.ts|//src/some:some\n' +
+      'add deps @npm//@angular/core:core @npm//rxjs:rxjs|//src/some:some\n' +
+      'set tsconfig "//:tsconfig"|//src/some:some';
+
+    expect(commands.join('\n')).toEqual(expected);
+  });
+
   it('can use tsconfig paths', async () => {
     mockfs({
       '/home/workspace': {
