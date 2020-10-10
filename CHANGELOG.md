@@ -3,6 +3,7 @@
 #### 0.0.0-PLACEHOLDER
 
 * **fix**: Remove @angular/core, @angular/common and rxjs dependencies when generating with the ng_bundle generator as these deps are already included by default
+* **fix**: Handle double quotes when resolving imports within Typescript files
 
 #### 0.5.0
 
