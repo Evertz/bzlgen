@@ -1,4 +1,4 @@
-import * as mockfs from 'mock-fs';
+import mockfs from 'mock-fs';
 
 import { Workspace } from '../../src/workspace';
 import { FilegroupGenerator } from '../../src/generators/builtin/filegroup.generator';

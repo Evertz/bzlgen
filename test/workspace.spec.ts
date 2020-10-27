@@ -1,4 +1,4 @@
-import * as mockfs from 'mock-fs';
+import mockfs from 'mock-fs';
 
 import { setupAndParseArgs } from '../src/flags';
 import { Workspace } from '../src/workspace';
