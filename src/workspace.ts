@@ -1,9 +1,9 @@
 import { lstatSync, readdirSync, readFileSync } from 'fs';
-import * as kebabCase from 'lodash.kebabcase';
+import kebabCase from 'lodash.kebabcase';
 import { isAbsolute, join, normalize, parse, sep, ParsedPath } from 'path';
 import * as shell from 'shelljs';
 import * as util from 'util';
-import * as minimatch from 'minimatch';
+import minimatch from 'minimatch';
 import * as BazelBuildozer from '@bazel/buildozer';
 
 import { Buildozer } from './buildozer';

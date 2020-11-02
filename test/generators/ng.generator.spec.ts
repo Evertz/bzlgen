@@ -1,4 +1,4 @@
-import * as mockfs from 'mock-fs';
+import mockfs from 'mock-fs';
 
 import { setupAndParseArgs } from '../../src/flags';
 import { NgGenerator } from '../../src/generators/ng/ng.generator';

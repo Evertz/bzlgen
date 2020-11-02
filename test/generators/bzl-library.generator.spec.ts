@@ -1,4 +1,4 @@
-import * as mockfs from 'mock-fs';
+import mockfs from 'mock-fs';
 
 import { Workspace } from '../../src/workspace';
 import { BzlLibraryGenerator } from '../../src/generators/bzl/bzl-library.generator';

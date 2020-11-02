@@ -1,4 +1,4 @@
-import * as mockfs from 'mock-fs';
+import mockfs from 'mock-fs';
 
 import { CommonFlags, setupAndParseArgs } from '../../src/flags';
 import { TsGenerator } from '../../src/generators/ts/ts.generator';

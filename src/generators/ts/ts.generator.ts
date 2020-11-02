@@ -1,7 +1,7 @@
 import { existsSync } from 'fs';
 import { join, parse, posix } from 'path';
 import { tsquery } from '@phenomnomnominal/tsquery';
-import * as Builtins from 'builtins';
+import Builtins from 'builtins';
 import { createMatchPath, MatchPath } from 'tsconfig-paths';
 import {
   ExportDeclaration,
