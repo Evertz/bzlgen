@@ -47,4 +47,17 @@ describe('labels', () => {
   it('throws when parsing a non absolute label', () => {
     expect(() => Label.parseAbsolute(':bin')).toThrow();
   });
+
+  it('can return the shortened label form', () => {
+    Label.SHORTEN_LABELS = true;
+    const label = Label.parseAbsolute('@bzl//some/package/here');
+    expect(label.toString()).toBe('@bzl//some/package/here');
+
+    const label2 = Label.parseAbsolute('@bzl//some/package/here:bin');
+    expect(label2.toString()).toBe('@bzl//some/package/here:bin');
+
+    Label.SHORTEN_LABELS = false;
+    const label3 = Label.parseAbsolute('@bzl//some/package/here');
+    expect(label3.toString()).toBe('@bzl//some/package/here:here');
+  });
 });

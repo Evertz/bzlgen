@@ -4,6 +4,8 @@ export class Label {
   static readonly PKG_SEP = '/';
   static readonly TARGET_ROOT_MARKER = ':';
 
+  static SHORTEN_LABELS = false;
+
   private constructor(private readonly workspace: string,
                       private readonly pkg: string,
                       private readonly target: string) {}
@@ -68,7 +70,12 @@ export class Label {
       str.push(this.getWorkspace(true));
     }
 
-    str.push(this.getPackage(true), this.getTarget(true));
+    str.push(this.getPackage(true));
+
+    if (!this.pkg.endsWith(this.target) || !Label.SHORTEN_LABELS) {
+      str.push(this.getTarget(true));
+    }
+
     return str.join('');
   }
 }
