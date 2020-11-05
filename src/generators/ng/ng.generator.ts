@@ -1,11 +1,13 @@
 import { tsquery } from '@phenomnomnominal/tsquery';
 import { parse } from 'path';
 import { StringLiteral } from 'typescript';
+import { Label } from '../../label';
 
 import { fatal } from '../../logger';
+import { ArrayAttrValue, Rule, SingleAttrValue } from '../../rules';
 import { Workspace } from '../../workspace';
 import { Generator } from '../resolve-generator';
-import { SassGenerator } from '../sass/sass.generator';
+import { SassBinaryRule, SassGenerator } from '../sass/sass.generator';
 import { TsGenerator } from '../ts/ts.generator';
 import { GeneratorType } from '../types';
 import { NgGeneratorFlagBuilder, NgGeneratorFlags } from './ng.generator.flags';
@@ -18,6 +20,38 @@ type TsFileResultContainer = {
   styles: Map<string, { deps: Set<string>, name: string }>
   assets: Set<string>
 };
+
+class NgModuleRule extends Rule {
+  constructor(label: Label, load?: string) {
+    super('ng_module', label, load);
+  }
+
+  setAssets(assets: ArrayAttrValue): this {
+    this.setAttr('assets', assets);
+    return this;
+  }
+
+  // for ng_module bundles
+  setStyle(style: SingleAttrValue): this {
+    this.setAttr('style', style);
+    return this;
+  }
+
+  setStyleDeps(deps: ArrayAttrValue): this {
+    this.setAttr('style_deps', deps);
+    return this;
+  }
+
+  setTheme(theme: SingleAttrValue): this {
+    this.setAttr('theme', theme);
+    return this;
+  }
+
+  setThemeDeps(deps: ArrayAttrValue): this {
+    this.setAttr('theme_deps', deps);
+    return this;
+  }
+}
 
 @Generator({
   type: GeneratorType.NG,
@@ -154,18 +188,22 @@ export class NgGenerator extends TsGenerator {
       .map(value => value.name);
 
     // generate the ng_module
-    this.buildozer.newNgModuleRule(this.workspace.getLabelForPath())
+    const ngModuleRule = new NgModuleRule(this.workspace.getLabelForPath())
       .setSrcs(tsFiles.map(file => file.split('/').pop()))
-      .addDeps(Array.from(resultContainer.tsDeps))
-      .addAssets(Array.from(resultContainer.assets).concat(styleRules))
-      .setVisibility(flags.default_visibility);
+      .setDeps(Array.from(resultContainer.tsDeps))
+      .setAssets(Array.from(resultContainer.assets).concat(styleRules));
+
+    this.setDefaultVisibility(ngModuleRule);
+
+    this.buildozer.addRule(ngModuleRule);
 
     // generate the sass_binary for styles
     resultContainer.styles.forEach((data, src) => {
-      this.buildozer.newSassBinaryRule(this.workspace.getLabelForPath().withTarget(data.name.split(':')[1]))
+      const sassBinaryRule = new SassBinaryRule(this.workspace.getLabelForPath().withTarget(data.name.split(':')[1]))
         .setSrc(src)
         .setDeps(Array.from(data.deps));
 
+      this.buildozer.addRule(sassBinaryRule);
       // TODO(matt): if there are deps on a sass import in the same package we should be able to generate it here
     });
 
@@ -174,9 +212,10 @@ export class NgGenerator extends TsGenerator {
       const themes = this.calculateScssDependencyLabels(themeFiles, new SassGenerator(this.workspace), flags.suffix_separator, 'theme');
 
       themes.forEach((data, src) => {
-        this.buildozer.newSassBinaryRule(this.workspace.getLabelForPath().withTarget(data.name.split(':')[1]))
+        const sassBinaryRule = new SassBinaryRule(this.workspace.getLabelForPath().withTarget(data.name.split(':')[1]))
           .setSrc(parse(src).base)
           .setDeps(Array.from(data.deps));
+        this.buildozer.addRule(sassBinaryRule);
       });
     }
   }
@@ -185,42 +224,40 @@ export class NgGenerator extends TsGenerator {
     const pathLabel = this.workspace.getLabelForPath();
     const flags = this.getFlags<NgGeneratorFlags>();
 
-    this.buildozer.newLoad(flags.ng_module_bundle_load, 'ng_module', pathLabel);
-    this.buildozer.newRule('ng_module', pathLabel);
-    this.buildozer.addAttr('srcs', tsFiles.map(file => file.split('/').pop()), pathLabel);
-
     const deps = Array.from(resultContainer.tsDeps)
       .filter(dep => !(dep.endsWith('@angular/core:core') || dep.endsWith('@angular/common:common') || dep.endsWith('rxjs:rxjs')));
 
-    if (deps.length) {
-      this.buildozer.addAttr('deps', deps, pathLabel);
-    }
+    const ngModuleBundleRule = new NgModuleRule(pathLabel, flags.ng_module_bundle_load)
+      .setSrcs(tsFiles.map(file => file.split('/').pop()))
+      .setDeps(deps);
 
     if (resultContainer.styles.size) {
       // ng_module macro only supports one style
       const style = Array.from(resultContainer.styles.entries())[0];
-      this.buildozer.setAttr('style', style[0], pathLabel);
+      ngModuleBundleRule.setStyle(style[0]);
 
       if (style[1].deps.size) {
-        this.buildozer.addAttr('style_deps', Array.from(style[1].deps), pathLabel);
+        ngModuleBundleRule.setStyleDeps(Array.from(style[1].deps));
       }
     }
 
     if (resultContainer.assets.size) {
-      this.buildozer.addAttr('assets', Array.from(resultContainer.assets), pathLabel);
+      ngModuleBundleRule.setAssets(Array.from(resultContainer.assets));
     }
 
     if (flags.ng_generate_theme_binary) {
       const themeFiles = allFiles.filter(file => file.endsWith('.theme.scss') && !file.startsWith('_'));
       if (themeFiles.length) {
         const themes = this.calculateScssDependencyLabels(themeFiles, new SassGenerator(this.workspace), flags.suffix_separator, 'theme');
-        this.buildozer.setAttr('theme', themeFiles[0].split('/').pop(), pathLabel);
+        ngModuleBundleRule.setTheme(themeFiles[0].split('/').pop());
 
         const theme = themes.get(themeFiles[0]);
         if (theme.deps.size) {
-          this.buildozer.addAttr('theme_deps', Array.from(theme.deps), pathLabel);
+          ngModuleBundleRule.setThemeDeps(Array.from(theme.deps));
         }
       }
     }
+
+    this.buildozer.addRule(ngModuleBundleRule);
   }
 }

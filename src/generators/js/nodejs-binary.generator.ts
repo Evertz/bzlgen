@@ -1,6 +1,14 @@
+import { Label } from '../../label';
+import { Rule } from '../../rules';
 import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
+
+class NodeJsBinaryRule extends Rule {
+  constructor(label: Label) {
+    super('nodejs_binary', label);
+  }
+}
 
 @Generator({
   type: GeneratorType.JS_BINARY,
@@ -12,14 +20,12 @@ export class NodejsBinaryGenerator extends BuildFileGenerator {
     const label = this.workspace.getLabelForPath().withTarget('bin');
     const path = this.getFlags().path;
 
-    this.buildozer.loadRule('nodejs_binary', label);
-    this.buildozer.newRule('nodejs_binary', label);
+    const nodejsBinaryRule = new NodeJsBinaryRule(label)
+      .setAttr('entry_point', this.workspace.getFileLabel(path).toString())
+      .setAttr('data', [this.workspace.getLabelForFile(path).toString()]);
 
-    this.buildozer.setAttr('entry_point',
-      this.workspace.getFileLabel(path).toString(), label);
-
-    this.buildozer.addAttr('data',
-      [this.workspace.getLabelForFile(path).toString()], label);
+    this.setDefaultVisibility(nodejsBinaryRule);
+    this.buildozer.addRule(nodejsBinaryRule);
   }
 
   getGeneratorType(): GeneratorType {

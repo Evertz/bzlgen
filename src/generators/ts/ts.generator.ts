@@ -22,9 +22,21 @@ import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
 import { TsGeneratorFlagBuilder, TsGeneratorFlags } from './ts.generator.flags';
+import { Rule, SingleAttrValue } from '../../rules';
 
 const IMPORTS_QUERY = `ImportDeclaration:has(StringLiteral)`;
 const EXPORTS_QUERY = `ExportDeclaration:has(StringLiteral)`;
+
+class TsLibraryRule extends Rule {
+  constructor(label: Label) {
+    super('ts_library', label);
+  }
+
+  setTsConfig(tsconfig: SingleAttrValue): this {
+    this.setAttr('tsconfig', tsconfig);
+    return this;
+  }
+}
 
 @Generator({
   type: GeneratorType.TS,
@@ -58,17 +70,16 @@ export class TsGenerator extends BuildFileGenerator {
     const label = this.workspace.isDirectory() ? this.workspace.getLabelForPath() :
       this.workspace.getLabelForPath().withTarget(this.workspace.getPathInfo().name);
 
-    const tsLibrary = this.buildozer.newTsLibraryRule(label)
+    const tsLibrary = new TsLibraryRule(label)
       .setSrcs(tsFiles.map(path => parse(path).base))
-      .addDeps(Array.from(deps));
+      .setDeps(Array.from(deps));
 
     if (this.flags.ts_config_label) {
-      tsLibrary.setTsconfig(this.flags.ts_config_label);
+      tsLibrary.setTsConfig(this.flags.ts_config_label);
     }
 
-    if (this.flags.default_visibility) {
-      tsLibrary.setVisibility(this.flags.default_visibility);
-    }
+    this.setDefaultVisibility(tsLibrary);
+    this.buildozer.addRule(tsLibrary);
   }
 
   getGeneratorType(): GeneratorType {

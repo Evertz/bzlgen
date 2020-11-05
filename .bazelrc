@@ -3,3 +3,9 @@ test --test_output=errors
 
 build:release --stamp
 build:release --workspace_status_command=./tools/bazel_stamp_vars.sh
+
+# Use bazel run with `--config=debug` to turn on the NodeJS inspector agent.
+# The node process will break before user code starts and wait for the debugger to connect.
+test:debug --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results --define=VERBOSE_LOGS=1
+run:debug --define=VERBOSE_LOGS=1 -- --node_options=--inspect-brk
+build:debug --compilation_mode=dbg

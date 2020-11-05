@@ -3,6 +3,7 @@ import { Workspace } from '../workspace';
 import { Buildozer } from '../buildozer';
 import { GeneratorType } from './types';
 import { Label } from '../label';
+import { Rule } from '../rules';
 
 export abstract class BuildFileGenerator {
   protected readonly buildozer: Buildozer;
@@ -49,6 +50,12 @@ export abstract class BuildFileGenerator {
   protected setDefaultVisibilityOn(label: Label) {
     if (this.getFlags().default_visibility) {
       this.buildozer.setVisibility([this.getFlags().default_visibility], label);
+    }
+  }
+
+  protected setDefaultVisibility(rule: Rule) {
+    if (this.getFlags().default_visibility) {
+      rule.setVisibility([this.getFlags().default_visibility]);
     }
   }
 }
