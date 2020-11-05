@@ -1,14 +1,15 @@
 import { CommandBatch } from '@bazel/buildozer';
 import { Label } from './label';
+import { Rule } from './rules';
 
-const DEFAULT_LOAD_SITES = new Map<string, string>([
+export const DEFAULT_LOAD_SITES = new Map<string, string>([
   ['sass_library', '@io_bazel_rules_sass//sass:sass.bzl'],
   ['sass_binary', '@io_bazel_rules_sass//sass:sass.bzl'],
   ['ts_library', '@npm//bazel/typescript:index.bzl'],
   ['ng_module', '@npm//angular/bazel:index.bzl'],
   ['nodejs_binary', '@build_bazel_rules_nodejs//:index.bzl'],
   ['container_layer', '@io_bazel_rules_docker//container:container.bzl'],
-  ['bzl_library', '@bazel_skylib//:bzl_library.bzl'],
+  ['bzl_library', '@bazel_skylib//:bzl_library.bzl']
 ]);
 
 /**
@@ -20,26 +21,10 @@ export class Buildozer {
 
   private readonly ruleLoadSites: ReadonlyMap<string, string>;
   private readonly batchedCommands: Map<string, string[]> = new Map<string, string[]>();
-  private readonly rules: Set<string> = new Set();
+  private readonly rules: Map<string, Rule> = new Map();
 
   constructor(loads: Map<string, string> = new Map()) {
     this.ruleLoadSites = this.mergeWithDefaultLoads(loads);
-  }
-
-  loadSassLibrary(label: Label) {
-    this.loadRule('sass_library', label);
-  }
-
-  loadSassBinary(label: Label) {
-    this.loadRule('sass_binary', label);
-  }
-
-  loadNgModule(label: Label) {
-    this.loadRule('ng_module', label);
-  }
-
-  loadTsLibrary(label: Label) {
-    this.loadRule('ts_library', label);
   }
 
   loadRule(type: string, label: Label) {
@@ -49,141 +34,12 @@ export class Buildozer {
     this.newLoad(from, type, label);
   }
 
-  getRuleLoadSite(type: string): string {
-    return this.ruleLoadSites.get(type);
-  }
-
-  newSassLibraryRule(label: Label) {
-    this.rules.add(label.getTarget());
-    this.loadSassLibrary(label);
-    this.newRule('sass_library', label);
-
-    const sassRuleHelper = {
-      setSrcs: (srcs: string[]) => {
-        this.addAttr('srcs', srcs, label);
-        return sassRuleHelper;
-      },
-      setDeps: (deps: Array<string | Label>) => {
-        if (deps && deps.length) {
-          this.addAttr('deps', deps.map(l => l.toString()), label);
-        }
-        return sassRuleHelper;
-      },
-      setVisibility: (visibility: string) => {
-        this.setVisibility([visibility], label);
-        return sassRuleHelper;
-      }
-    };
-
-    return sassRuleHelper;
-  }
-
-  newSassBinaryRule(label: Label) {
-    this.loadSassBinary(label);
-    this.newRule('sass_binary', label);
-
-    const sassRuleHelper = {
-      setSrc: (src: string) => {
-        this.setAttr('src', src, label);
-        return sassRuleHelper;
-      },
-      setDeps: (deps: Array<string | Label>) => {
-        if (deps && deps.length) {
-          this.addAttr('deps', deps.map(l => l.toString()), label);
-        }
-        return sassRuleHelper;
-      },
-      setVisibility: (visibility: string) => {
-        this.setVisibility([visibility], label);
-        return sassRuleHelper;
-      }
-    };
-
-    return sassRuleHelper;
-  }
-
-  newNgModuleRule(label: Label) {
-    this.loadNgModule(label);
-    this.newRule('ng_module', label);
-
-    const ngModuleRuleHelper = {
-      setSrcs: (srcs: string[]) => {
-        this.addAttr('srcs', srcs, label);
-        return ngModuleRuleHelper;
-      },
-      addAssets: (assets: string[]) => {
-        if (assets && assets.length) {
-          this.addAttr('assets', assets, label);
-        }
-        return ngModuleRuleHelper;
-      },
-      setTsconfig: (tsconfig: string) => {
-        this.setAttr('tsconfig', tsconfig, label);
-        return ngModuleRuleHelper;
-      },
-      addDeps: (deps: Array<string | Label>) => {
-        if (deps && deps.length) {
-          this.addDep(deps, label);
-        }
-        return ngModuleRuleHelper;
-      },
-      setVisibility: (visibility: string) => {
-        if (visibility) {
-          this.setVisibility([visibility], label);
-        }
-        return ngModuleRuleHelper;
-      }
-    };
-
-    return ngModuleRuleHelper;
-  }
-
-  newTsLibraryRule(label: Label) {
-    this.loadTsLibrary(label);
-    this.newRule('ts_library', label);
-
-    const tsLibraryRuleHelper = {
-      setSrcs: (srcs: string[]) => {
-        this.addAttr('srcs', srcs, label);
-        return tsLibraryRuleHelper;
-      },
-      setTsconfig: (tsconfig: string) => {
-        this.setAttr('tsconfig', tsconfig, label);
-        return tsLibraryRuleHelper;
-      },
-      addDeps: (deps: Array<Label| string>) => {
-        if (deps && deps.length) {
-          this.addDep(deps, label);
-        }
-        return tsLibraryRuleHelper;
-      },
-      setVisibility: (visibility: string) => {
-        this.setVisibility([visibility], label);
-        return tsLibraryRuleHelper;
-      }
-    };
-
-    return tsLibraryRuleHelper;
-  }
-
-  newFilegroup(label: Label) {
-    this.newRule('filegroup', label);
-
-    const fileGroupRuleHelper = {
-      setSrcs: (srcs: string[]) => {
-        this.addAttr('srcs', srcs, label);
-        return fileGroupRuleHelper;
-      },
-      setVisibility: (visibility: string) => {
-        this.setVisibility([visibility], label);
-        return fileGroupRuleHelper;
-      }
-    };
-    return fileGroupRuleHelper;
+  addRule(rule: Rule) {
+    this.rules.set(rule.label.toString(), rule);
+    rule.toCommands(this);
   }
 
   newRule(rule: string, label: Label) {
-    this.rules.add(label.getTarget());
     this.addCommand(`new ${rule} ${label.getTarget()}`, label.withTarget(Buildozer.PKG));
   }
 
@@ -217,10 +73,6 @@ export class Buildozer {
     this.addCommand(`remove ${attr}`, label);
   }
 
-  hasRule(name: string): boolean {
-    return this.rules.has(name);
-  }
-
   /**
    * Returns a CommandBatch array, suitable for passing to the @bazel/buildozer API
    */
@@ -242,6 +94,37 @@ export class Buildozer {
   toCommands(): string[] {
     return this.toCommandBatch()
       .flatMap(batch => batch.commands.map(command => `${command}|${batch.targets[0]}`));
+  }
+
+  /**
+   * Merges an existing buildozer instance to this one
+   * @param buildozer
+   */
+  merge(buildozer: Buildozer): Buildozer {
+    buildozer.batchedCommands.forEach((value, key) => {
+      if (!this.batchedCommands.has(key)) {
+        this.batchedCommands.set(key, []);
+      }
+      this.batchedCommands.get(key).push(...value);
+    });
+
+    buildozer.rules.forEach((value, key) => {
+      this.rules.set(key, value);
+    });
+
+    return this;
+  }
+
+  /**
+   * Returns an added rule contained within this buildozer instance
+   * @param label
+   */
+  getRule(label: Label | string): Rule {
+    return this.rules.get(label.toString());
+  }
+
+  getRuleLoadSite(type: string): string {
+    return this.ruleLoadSites.get(type);
   }
 
   private addCommand(command: string, label: Label) {

@@ -2,12 +2,26 @@ import * as gonzales from 'gonzales-pe';
 import { ParsedPath } from 'path';
 
 import { Flags } from '../../flags';
+import { Label } from '../../label';
 import { log } from '../../logger';
+import { Rule } from '../../rules';
 import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
 import { SassGeneratorFlagBuilder, SassGeneratorFlags } from './sass.generator.flags';
+
+export class SassBinaryRule extends Rule {
+  constructor(label: Label) {
+    super('sass_binary', label);
+  }
+}
+
+export class SassLibraryRule extends Rule {
+  constructor(label: Label) {
+    super('sass_library', label);
+  }
+}
 
 @Generator({
   type: GeneratorType.SASS,
@@ -37,23 +51,20 @@ export class SassGenerator extends BuildFileGenerator {
 
     const label = this.workspace.getLabelForPath();
 
+    let rule: Rule;
+
     if (isSassLib) {
-      const sassLib = this.buildozer.newSassLibraryRule(label.withTarget(ruleName))
+      rule = new SassLibraryRule(label.withTarget(ruleName))
         .setSrcs([scssFileInfo.base])
         .setDeps(deps);
-
-      if (flags.default_visibility) {
-        sassLib.setVisibility(flags.default_visibility);
-      }
     } else {
-      const sassBin = this.buildozer.newSassBinaryRule(label.withTarget(ruleName))
+      rule = new SassBinaryRule(label.withTarget(ruleName))
         .setSrc(scssFileInfo.base)
         .setDeps(deps);
-
-      if (flags.default_visibility) {
-        sassBin.setVisibility(flags.default_visibility);
-      }
     }
+
+    this.setDefaultVisibility(rule);
+    this.buildozer.addRule(rule);
   }
 
   getGeneratorType(): GeneratorType {

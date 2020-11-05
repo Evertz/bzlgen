@@ -1,6 +1,14 @@
+import { Label } from '../../label';
+import { Rule } from '../../rules';
 import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
+
+class FilegroupRule extends Rule {
+  constructor(label: Label) {
+    super('filegroup', label);
+  }
+}
 
 @Generator({
   type: GeneratorType.FILEGROUP,
@@ -9,8 +17,6 @@ import { GeneratorType } from '../types';
 export class FilegroupGenerator extends BuildFileGenerator {
   async generate(): Promise<void> {
     const label = this.workspace.getLabelForPath();
-
-    this.buildozer.newRule('filegroup', label);
 
     const files = [];
     if (this.workspace.isDirectory()) {
@@ -22,9 +28,10 @@ export class FilegroupGenerator extends BuildFileGenerator {
       files.push(this.workspace.getFileLabel(this.getFlags().path));
     }
 
-    this.buildozer.addAttr('srcs', files, label);
+    const filegroup = new FilegroupRule(label).setSrcs(files);
+    this.setDefaultVisibility(filegroup);
 
-    this.setDefaultVisibilityOn(label);
+    this.buildozer.addRule(filegroup);
   }
 
   getGeneratorType(): GeneratorType | string {

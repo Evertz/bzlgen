@@ -1,6 +1,14 @@
+import { Label } from '../../label';
+import { Rule } from '../../rules';
 import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
+
+class BzlLibraryRule extends Rule {
+  constructor(label: Label) {
+    super('bzl_library', label)
+  }
+}
 
 @Generator({
   type: 'bzl_library',
@@ -10,9 +18,6 @@ export class BzlLibraryGenerator extends BuildFileGenerator {
   async generate(): Promise<void> {
     const label = this.workspace.getLabelForPath();
     const bzl = label.withTarget('bzl');
-
-    this.buildozer.loadRule('bzl_library', label);
-    this.buildozer.newRule('bzl_library', bzl);
 
     const files = [];
     if (this.workspace.isDirectory()) {
@@ -25,9 +30,10 @@ export class BzlLibraryGenerator extends BuildFileGenerator {
       files.push(this.workspace.getFileLabel(this.getFlags().path));
     }
 
-    this.buildozer.addAttr('srcs', files, bzl);
+    const bzlLibraryRule = new BzlLibraryRule(bzl).setSrcs(files);
+    this.setDefaultVisibility(bzlLibraryRule);
 
-    this.setDefaultVisibilityOn(bzl);
+    this.buildozer.addRule(bzlLibraryRule);
   }
 
   getGeneratorType(): GeneratorType | string {

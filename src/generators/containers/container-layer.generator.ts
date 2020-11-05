@@ -1,6 +1,14 @@
+import { Label } from '../../label';
+import { Rule } from '../../rules';
 import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
+
+class ContainerLayerRule extends Rule {
+  constructor(label: Label) {
+    super('container_layer', label);
+  }
+}
 
 @Generator({
   type: GeneratorType.CONTAINER_LAYER,
@@ -10,9 +18,6 @@ export class ContainerLayerGenerator extends BuildFileGenerator {
 
   async generate(): Promise<void> {
     const label = this.workspace.getLabelForPath().withTarget('layer');
-
-    this.buildozer.loadRule('container_layer', label);
-    this.buildozer.newRule('container_layer', label);
 
     const files = [];
     if (this.workspace.isDirectory()) {
@@ -24,9 +29,10 @@ export class ContainerLayerGenerator extends BuildFileGenerator {
       files.push(this.workspace.getFileLabel(this.getFlags().path));
     }
 
-    this.buildozer.addAttr('files', files, label);
+    const containerLayerRule = new ContainerLayerRule(label).setAttr('files', files);
+    this.setDefaultVisibility(containerLayerRule);
 
-    this.setDefaultVisibilityOn(label);
+    this.buildozer.addRule(containerLayerRule);
   }
 
   getGeneratorType(): GeneratorType {
