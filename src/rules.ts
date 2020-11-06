@@ -2,7 +2,7 @@ import { Buildozer, DEFAULT_LOAD_SITES } from './buildozer';
 import { Label } from './label';
 
 export type SingleAttrValue = string | Label;
-export type ArrayAttrValue = string[] | Label[];
+export type ArrayAttrValue = Array<string | Label>;
 export type AttrValue = SingleAttrValue | ArrayAttrValue;
 
 /**
