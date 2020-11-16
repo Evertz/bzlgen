@@ -21,7 +21,7 @@ import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
-import { TsGeneratorFlagBuilder, TsGeneratorFlags } from './ts.generator.flags';
+import { TsGeneratorFlags } from './ts.generator.flags';
 import { Rule, SingleAttrValue } from '../../rules';
 
 const IMPORTS_QUERY = `ImportDeclaration:has(StringLiteral)`;
@@ -39,9 +39,9 @@ class TsLibraryRule extends Rule {
 }
 
 @Generator({
-  type: GeneratorType.TS,
-  flags: TsGeneratorFlagBuilder,
-  description: 'Generates a ts_library for the files or file at path'
+  type: 'ts',
+  description: 'Generates a ts_library for the files or file at path',
+  flags: TsGeneratorFlags
 })
 export class TsGenerator extends BuildFileGenerator {
   protected readonly tsPathsMatcher: MatchPath;

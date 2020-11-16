@@ -1,26 +1,17 @@
-export const SassGeneratorFlagBuilder = {
-  scss_library_suffix: {
-    type: 'string',
-    description: 'Suffix used for scss_library rule names',
-    default: 'scss_library',
-    group: 'SCSS Generator'
-  },
-  scss_binary_suffix: {
-    type: 'string',
-    description: 'Suffix used for scss_binary rule names',
-    default: 'scss',
-    group: 'SCSS Generator'
-  }
-};
+import { Flag } from '../../flags';
 
-export interface SassGeneratorFlags {
-  /**
-   * Suffix used for scss_library rule names
-   */
+export abstract class SassGeneratorFlags {
+  @Flag({
+    description: 'Suffix used for scss_library rule names',
+    type: 'string',
+    default: 'scss_library'
+  })
   scss_library_suffix: string;
 
-  /**
-   * Suffix used for scss_binary rule names
-   */
+  @Flag({
+    description: 'Suffix used for scss_binary rule names',
+    type: 'string',
+    default: 'scss'
+  })
   scss_binary_suffix: string;
 }

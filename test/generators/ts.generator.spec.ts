@@ -178,6 +178,8 @@ set tsconfig "//:tsconfig"|//src/some:some`;
       }
     });
 
+    (workspace.getFlags() as CommonFlags).pkg_default_dep_labels = true;
+
     await gen.generate();
 
     const commands = workspace.getBuildozer().toCommands();

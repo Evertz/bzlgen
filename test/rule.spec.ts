@@ -14,7 +14,7 @@ describe('rule', () => {
     const commands = buildozer.toCommands().join('\n');
 
     const expected =
-      'new_load @npm//bazel/typescript:index.bzl ts_library|//foo:__pkg__\n' +
+      'new_load @npm//@bazel/typescript:index.bzl ts_library|//foo:__pkg__\n' +
       'new ts_library bar|//foo:__pkg__\n' +
       'add deps baz|//foo:bar\n' +
       'add srcs foo.ts|//foo:bar\n' +

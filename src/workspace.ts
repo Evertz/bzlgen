@@ -1,6 +1,6 @@
 import { lstatSync, readdirSync, readFileSync } from 'fs';
 import kebabCase from 'lodash.kebabcase';
-import { isAbsolute, join, normalize, parse, sep, ParsedPath } from 'path';
+import { isAbsolute, join, normalize, parse, ParsedPath, sep } from 'path';
 import * as shell from 'shelljs';
 import * as util from 'util';
 import minimatch from 'minimatch';
@@ -42,7 +42,7 @@ export class Workspace {
   }
 
   getFlags<T>(): Flags<T> {
-    return this.flags;
+    return this.flags as Flags<T>;
   }
 
   getPath(): string {
@@ -423,7 +423,7 @@ export class Workspace {
     const term2 = `"attr('srcs', ${label}, //...)"`;
 
     const result = shell.exec(
-      `${this.flags.bzl_binary} query ${Workspace.QUERY_FLAGS} ${term} + ${term2}`,
+      `${this.flags.bazel_binary} query ${Workspace.QUERY_FLAGS} ${term} + ${term2}`,
       { cwd: this.getFlags().base_dir, silent: !this.flags.debug }
     );
 

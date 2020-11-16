@@ -9,7 +9,7 @@ import { Workspace } from '../../workspace';
 import { BuildFileGenerator } from '../generator';
 import { Generator } from '../resolve-generator';
 import { GeneratorType } from '../types';
-import { SassGeneratorFlagBuilder, SassGeneratorFlags } from './sass.generator.flags';
+import { SassGeneratorFlags } from './sass.generator.flags';
 
 export class SassBinaryRule extends Rule {
   constructor(label: Label) {
@@ -25,7 +25,7 @@ export class SassLibraryRule extends Rule {
 
 @Generator({
   type: GeneratorType.SASS,
-  flags: SassGeneratorFlagBuilder,
+  flags: SassGeneratorFlags,
   description: 'Generates a sass_binary or sass_library depending on the input path type'
 })
 export class SassGenerator extends BuildFileGenerator {
@@ -38,7 +38,6 @@ export class SassGenerator extends BuildFileGenerator {
   }
 
   async generate(): Promise<void> {
-    const flags = this.workspace.getFlags();
     const scss = this.workspace.readFileAtPath();
 
     const deps = this.calculateDeps(scss);
