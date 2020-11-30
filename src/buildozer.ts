@@ -5,8 +5,8 @@ import { Rule } from './rules';
 export const DEFAULT_LOAD_SITES = new Map<string, string>([
   ['sass_library', '@io_bazel_rules_sass//sass:sass.bzl'],
   ['sass_binary', '@io_bazel_rules_sass//sass:sass.bzl'],
-  ['ts_library', '@npm//bazel/typescript:index.bzl'],
-  ['ng_module', '@npm//angular/bazel:index.bzl'],
+  ['ts_library', '@npm//@bazel/typescript:index.bzl'],
+  ['ng_module', '@npm//@angular/bazel:index.bzl'],
   ['nodejs_binary', '@build_bazel_rules_nodejs//:index.bzl'],
   ['container_layer', '@io_bazel_rules_docker//container:container.bzl'],
   ['bzl_library', '@bazel_skylib//:bzl_library.bzl']

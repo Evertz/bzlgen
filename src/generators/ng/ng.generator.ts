@@ -3,14 +3,15 @@ import { parse } from 'path';
 import { StringLiteral } from 'typescript';
 import { Label } from '../../label';
 
-import { fatal } from '../../logger';
+import { fatal, warn } from '../../logger';
 import { ArrayAttrValue, Rule, SingleAttrValue } from '../../rules';
 import { Workspace } from '../../workspace';
 import { Generator } from '../resolve-generator';
 import { SassBinaryRule, SassGenerator } from '../sass/sass.generator';
 import { TsGenerator } from '../ts/ts.generator';
 import { GeneratorType } from '../types';
-import { NgGeneratorFlagBuilder, NgGeneratorFlags } from './ng.generator.flags';
+import { NgGeneratorFlags } from './ng.generator.flags';
+import { TsGeneratorFlags } from '../ts/ts.generator.flags';
 
 const STYLE_URLS_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="styleUrls"]) ArrayLiteralExpression StringLiteral';
 const TEMPLATE_URL_QUERY = 'Decorator:has(Decorator > CallExpression[expression.name="Component"]) PropertyAssignment:has([name="templateUrl"]) StringLiteral';
@@ -55,12 +56,12 @@ class NgModuleRule extends Rule {
 
 @Generator({
   type: GeneratorType.NG,
-  flags: NgGeneratorFlagBuilder,
+  flags: [NgGeneratorFlags, TsGeneratorFlags],
   description: 'Generates a ng_module rule for an Angular component'
 })
 @Generator({
   type: GeneratorType.NG_BUNDLE,
-  flags: NgGeneratorFlagBuilder,
+  flags: [NgGeneratorFlags, TsGeneratorFlags],
   description: 'Generates a ng_module macro rule for an Angular component'
 })
 export class NgGenerator extends TsGenerator {
@@ -142,10 +143,11 @@ export class NgGenerator extends TsGenerator {
         // the component has a style imported from a parent directory
         // we can't generate files into the parent directory under bazel, so throw an error here
         // showing the user how this can be fixed
-        const message = `Unable to generate target Angular component in file ${ filePath } as it contains a reference ` +
+        const message = `The Angular component in file ${ filePath } contains a reference ` +
           `to the following style sheets imported from the parent directory:\n\t${ abstractStyles.join('\n\t') }\n` +
-          `This can be fixed by using adding an @import for each sass file`;
-        fatal(message);
+          `These will not be included in the generated ${ this.flags.build_file_name } file and will need to be manually added ` + 
+          `or, imported via @import in a scss file`;
+        warn(message);
       }
 
       const scssFiles = styleUrlsNodes
